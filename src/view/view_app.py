@@ -1,19 +1,11 @@
 import os
 from ctransformers import AutoModelForCausalLM
-
+import requests
 
 def show_chat_app(st, session_state_username):
     st.write("Welcome ", session_state_username)
 
-    @st.cache_resource()
-    def ChatModel(temperature, top_p):
-        model_path_name = "/Users/praveen/Desktop/LLMs/AIaaS_LLM/BTO_LLM_App/models/llama-2-7b-chat.ggmlv3.q4_0.bin"
-        return AutoModelForCausalLM.from_pretrained(
-            model_path_or_repo_id=model_path_name,
-            model_type="llama",
-            temperature=temperature,
-            top_p=top_p,
-        )
+    
 
     # Replicate Credentials
     with st.sidebar:
@@ -28,7 +20,6 @@ def show_chat_app(st, session_state_username):
             "top_p", min_value=0.01, max_value=1.0, value=0.9, step=0.01
         )
         # max_length = st.sidebar.slider('max_length', min_value=64, max_value=4096, value=512, step=8)
-        chat_model = ChatModel(temperature, top_p)
         # st.markdown('📖 Learn how to build this app in this [blog](#link-to-blog)!')
 
     # Store LLM generated responses
@@ -49,16 +40,20 @@ def show_chat_app(st, session_state_username):
 
     st.sidebar.button("Clear Chat History", on_click=clear_chat_history)
 
-    # Function for generating LLaMA2 response
-    def generate_llama2_response(prompt_input):
-        string_dialogue = "You are a helpful assistant. You do not respond as 'User' or pretend to be 'User'. You only respond once as 'Assistant'."
-        for dict_message in st.session_state.messages:
-            if dict_message["role"] == "user":
-                string_dialogue += "User: " + dict_message["content"] + "\\n\\n"
-            else:
-                string_dialogue += "Assistant: " + dict_message["content"] + "\\n\\n"
-        output = chat_model(f"prompt {string_dialogue} {prompt_input} Assistant: ")
-        return output
+    # Function for generating LLaMA2 response using FastAPI endpoint
+    @st.cache_resource()
+    def generate_llama2_response(prompt_input,temperature,top_p,user_assistant):
+
+        url = "http://localhost:8000/generate_response"
+        data = {
+            "prompt_input": prompt_input,
+            "temperature": temperature,
+            "top_p": top_p,
+            "user_assistant": str(user_assistant)
+        }
+        response = requests.get(url,params=data)
+        return response.text  # You might need to parse the response as needed
+
 
     # User-provided prompt
     if prompt := st.chat_input():
@@ -70,7 +65,9 @@ def show_chat_app(st, session_state_username):
     if st.session_state.messages[-1]["role"] != "assistant":
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
-                response = generate_llama2_response(prompt)
+                user_assistant = st.session_state.messages
+                st.write("user_assistant",user_assistant)
+                response = generate_llama2_response(prompt,temperature,top_p,user_assistant)
                 placeholder = st.empty()
                 full_response = ""
                 for item in response:
