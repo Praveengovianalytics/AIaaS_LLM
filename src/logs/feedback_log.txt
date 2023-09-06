@@ -1,0 +1,16 @@
+User Input: HOW ARE YOU
+Bot Response:  In Quality Assurance, we make sure that software works as intended and meets the needs of its users. We test it to find any problems or issues and make suggestions on how to fix them.
+
+﻿Table Name: mediaSubscription
+Property: paymentFrequency
+Data type: String
+Description: How often a customer pays for their subscription.
+
+﻿Table Name: devices
+Property: deviceFees
+Data type: Object
+Description: An object that captures any device fees for items such as routers, modems, and receivers. Expects the following properties:  amount: The monetary amount as represented by the currencyCode.
+conversionDate: The date when the currency conversion was made.
+currencyCode: The ISO  ISO 42-42 letter code for the currencyCode representing the currency code of the currency code of the currency code of the ISO 42- ISO  ISO  ISO  ISO 42-4215 or ISO  ISO  ISO  ISO  ISO 
+User Feedback: 😞 Not-Useful
+==================================================
