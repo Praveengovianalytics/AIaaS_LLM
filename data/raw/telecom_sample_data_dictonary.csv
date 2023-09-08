@@ -1,0 +1,107 @@
+﻿Table Name ,Property,Data type,Description
+Subscription,internetSubscription,Array of objects,"Describes internet subscription plan details such as data cap, connection type, and speed details. See the section below for more information."
+Subscription,landlineSubscription,Array of objects,"Describes landline subscription plan details, including selected features, minutes, and dialing plans. See the section below for more information."
+Subscription,mediaSubscription,Array of objects,"Describes media subscription plan details, including the number of channels and included streaming services. See the section below for more information."
+Subscription,mobileSubscription,Array of objects,"Describes mobile subscription plan details, including the number of lines, data rates, cost, and more. See the section below for more information."
+Subscription,primarySubscriber,Person,Describes the owner of the subscription.
+Subscription,bundleName,String,"Captures the name of any type of subscription bundle in which the customer is enrolled, such as Internet + Media."
+Subscription,primaryPartyID,String,"An identifier for the primary person responsible for the subscription, which typically could be their device phone number."
+internetSubscription,subscriptionDetails,Telecom Subscription,"Describes general details about the subscription, including subscription length, fees, status, and more. Describes general details about the subscription, including subscription length, fees, status, and more."
+internetSubscription,connectionType,String,The connection type for the subscription.
+internetSubscription,dataCap,Integer,"The data cap limit for the account, in megabytes (MB)."
+internetSubscription,downloadSpeed,Integer,"The maximum download speed available for the subscription, in megabytes (MB)."
+internetSubscription,selfSetup,Boolean,Indicates whether a customer is eligible for internet setup without a visit from a technician.
+internetSubscription,uploadSpeed,Integer,"The maximum upload speed available for the subscription, in megabytes (MB)."
+,,,
+landlineSubscription,phoneNumber,Phone Number,The phone number assigned to this subscription.
+landlineSubscription,subscriptionDetails,Telecom Subscription,"Describes general details about the subscription, including subscription length, fees, status, and more."
+landlineSubscription,callBlocking,Boolean,Indicates whether the landline subscription features include call blocking.
+landlineSubscription,callForwarding,Boolean,Indicates whether the landline subscription features include call forwarding.
+landlineSubscription,callWaiting,Boolean,Indicates whether the landline subscription features include call waiting.
+landlineSubscription,callerID,Boolean,Indicates whether the landline subscription features include caller ID.
+landlineSubscription,internationalCalling,Boolean,Indicates whether the landline subscription features include international calling.
+landlineSubscription,minutes,Integer,The number of monthly minutes available within the subscription.
+landlineSubscription,threeWayCalling,Boolean,Indicates whether the landline subscription features include three-way calling.
+landlineSubscription,unlimitedDomesticLongDistance,Boolean,Indicates whether the landline subscription features include unlimited domestic long-distance calling.
+landlineSubscription,unlimitedLocalCalling,Boolean,Indicates whether the landline subscription features include unlimited local calling.
+landlineSubscription,voicemail,Boolean,Indicates whether the landline subscription features include voicemail.
+mediaSubscription,treamingServices,Array of Objects,"A list of all streaming services included with the subscription. Each array item includes the following properties:promotionLength: The length of the promotion, in months, if the streaming service was added as part of a promotion.
+promotionalAddition: Indicates whether the streaming service was added as part of a promotion.
+serviceName: The name of the streaming service."
+mediaSubscription,subscriptionDetails,Telecom Subscription,"Describes general details about the subscription, including subscription length, fees, status, and more."
+mediaSubscription,channels,Integer,The number of channels included with the media subscription.
+mobileSubscription,phoneNumber,Phone Number,The phone number assigned to this subscription.
+mobileSubscription,subscriptionDetails,Telecom Subscription,"Describes general details about the subscription, including subscription length, fees, status, and more."
+mobileSubscription,earlyUpgradeEnrollment,Boolean,Indicates whether the customer opts in for early upgrades.
+mobileSubscription,planLevel,String,The name of the mobile plan assigned to this subscription.
+mobileSubscription,portedNumber,Boolean,Indicates whether the customer ports their number from another carrier.
+demographic_details,person.name,Person name,An object whose sub-fields describe various elements of a person’s name.
+demographic_details,person.birthDate,Date,"The full date a person was born on, in the form of an ISO 8601 timestamp."
+demographic_details,person.birthDayAndMonth,String,"The day and month a person was born, in the format MM-DD. This field should be used when the day and month of a person’s birth is known, but not the year."
+demographic_details,person.birthYear,Integer,"The year a person was born, including the century (such as 1989). This field should be used when only the person’s age is known, not the full birth date."
+demographic_details,person.gender,String,The gender identity of the person.
+demographic_details,person.martialStatus,String,Describes a person’s relationship with a significant other.
+demographic_details,person.nationality,String,The legal relationship between a person and their state represented using the ISO 3166-1 Alpha-2 code.
+demographic_details,person.taxId,String,"The tax/fiscal ID of the person, such the TIN in the US or the CIF/NIF in Spain."
+personal_contact_details,faxPhone,Phone number,Describes the person’s fax number.
+personal_contact_details,homeAddress,Postal address,Describes the person’s residential address.
+personal_contact_details,homePhone,Phone number,Describes the person’s home phone number.
+personal_contact_details,mobilePhone,Phone number,Describes the person’s mobile phone number.
+personal_contact_details,personalEmail,Email address,Describes the person’s email address.
+upsell_deails,phoneNumber,Phone Number,
+upsell_deails,upsellImpressions,Array of Impressions,An array that lists the recorded impressions (digital views or engagements with the upsell offer) for the customer.
+upsell_deails,upsellTransaction,Transaction,Describes the currency transaction for the upsell.
+telecom_subscription,devices,Array of objects,Describes a list of of devices and/or accessories associated with the plan. See the section below for details on the expected structure of each array item.
+telecom_subscription,subscriber,Person,Describes the owner of the subscription.
+telecom_subscription,ID,String,A unique identifier for the subscription instance.
+telecom_subscription,billingPeriod,String,The duration between billings.
+telecom_subscription,billingStartDate,Date,"The date when the billing period begins. The date format (without time) should follow the RFC 3339, section 5.6 standard."
+telecom_subscription,chargeMethod,String,The way the billing is set up to charge the customer.
+telecom_subscription,contractID,String,The unique ID for the contract that governs this subscription.
+telecom_subscription,country,String,The country that the subscription contractual and agreement terms are rooted in.
+telecom_subscription,endDate,Date,"The date the current subscription term ends. The date format (without time) should follow the RFC 3339, section 5.6 standard."
+telecom_subscription,paymentDueDate,Date,"The date when the subscription payment is due. The date format (without time) should follow the RFC 3339, section 5.6 standard."
+telecom_subscription,paymentMethod,String,The payment method for recurring payments.
+telecom_subscription,paymentStatus,String,The payment standing of the account.
+telecom_subscription,planName,String,The human-readable name for the subscription.
+telecom_subscription,reason,String,The general intent the member has for the use of the subscription.
+telecom_subscription,renew,String,The agreed way that the subscription may continue after the end date.
+telecom_subscription,startDate,Date,"The date the subscription begins. The date format (without time) should follow the RFC 3339, section 5.6 standard."
+telecom_subscription,status,String,The current status of the subscription.
+telecom_subscription,subscriptionCategory,String,"The main, top-level categorization of this type of subscription."
+telecom_subscription,subscriptionSKU,String,The stock keeping unit (SKU) for the subscription.
+telecom_subscription,subscriptionSubCategory,String,The specific sub-categorization of the subscription.
+telecom_subscription,term,Integer,The numeric value of the subscription term.
+telecom_subscription,termUnitOfTime,String,The unit of time for the term period.
+telecom_subscription,topUp,String,Describes the agreed terms for how consumable aspects of a subscription are repurchased during a billing period.
+telecom_subscription,type,String,The scope of entitlement in relation to how many people are covered by the subscription.
+devices ,deviceFees,Object,"An object that captures any device fees for items such as routers, modems, and receivers. Expects the following properties:  amount: The monetary amount as represented by the currencyCode.
+conversionDate: The date when the currency conversion was made.
+currencyCode: The ISO 4217 currency code for the amount."
+devices ,ID,String,A unique ID for the device.
+devices ,OS,String,The device operating system.
+devices ,deviceInsurance,String,Indicates whether a customer has opted in to insurance for this device.
+devices ,manufacturer,String,The device manufacturer.
+devices ,name,String,A name for the device.
+devices ,paymentOptions,String,Indicates whether the device will be paid for in installments or full retail price.
+devices ,serialNumber,String,The device serial number.
+devices ,status,String,The device status.
+devices ,storageCapacity,String,The device storage capacity.
+devices ,type,String,The device type.
+product_list,selectedOptions,Array of objects,"Contains custom options chosen for a configurable product. Each list item is an object with the following properties:
+attribute: A name for the configurable attribute.
+value: The value of the attribute."
+product_list,SKU,String,"Stock keeping unit (SKU), the unique identifier for a product defined by the vendor."
+product_list,_id,String,The line item identifier for this product entry. The product itself is identified through product.
+product_list,currencyCode,String,The ISO 4217 alphabetic currency code used for pricing the product.
+product_list,discountAmount,Double,"If the product is discounted, this represents the difference between the regular price and the special price for the product."
+product_list,name,String,The display name for the product as presented to the user for this product view.
+product_list,priceTotal,Double,The total price for the product line item.
+product_list,product,String (URI),The URI $id of the XDM schema that captures the product itself.
+product_list,productAddMethod,String,The method that was used to add a product item to the list by the visitor.
+product_list,productImageUrl,String,A URL for the main image of the product.
+product_list,quantity,Integer,The number of units the customer has indicated they require of the product.
+product_list,unitOfMeasureCode,String,The standard unit of measure code for the product as related to the quantity property.
+upgrade_details,phoneNumber,Phone Number,Phone number
+upgrade_details,upgradeImpressions,Array of Impressions,An array that lists the recorded impressions (digital views or engagements with the upgrade offer) for the customer.
+upgrade_details,upgradeTransaction,Transaction,Describes the currency transaction for the upgrade.
