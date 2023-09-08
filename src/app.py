@@ -6,11 +6,6 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain.document_loaders.csv_loader import CSVLoader
 from langchain.vectorstores import FAISS
 import tempfile
-<<<<<<< HEAD
-
-=======
-import os
->>>>>>> 9a2291677f91277dd362ce69d08c9ff7547d97be
 
 #user_api_key = st.sidebar.text_input(
 #    label="#### Your OpenAI API key 👇",
