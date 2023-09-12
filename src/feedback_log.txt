@@ -1,0 +1,6 @@
+User_Timestamp: 2023-09-07 00:06:31 | User_Input: hi dear
+Bot_Timestamp: 2023-09-07 00:07:16 | Bot_Response:  I'm good thanks for asking!
+
+
+Feedback_Timestamp: 2023-09-07 00:07:23 | User_Feedback: 😃 Useful
+==================================================
