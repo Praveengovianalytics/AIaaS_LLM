@@ -11,5 +11,8 @@ class Param:
     EMBEDDING_DEVICE = 'cpu'
     CSV_DELIMITER = ','
     CSV_ENCODING = "utf-8"
+    TEMP_SAVE_PATH = f"{APP_PATH}/src/static/temp/"
+    EMBEDDING_SAVE_PATH=f"{APP_PATH}/src/static/embedding/"
+
     FEEDBACK_LOG_FILE = f"{APP_PATH}logs/feedback_log.txt"
     AUTH_HASH_PASS_FILE = f"{APP_PATH}/src/core/secret/hashed_passwords.txt"
