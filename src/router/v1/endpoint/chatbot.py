@@ -48,7 +48,7 @@ def create_embedding(file: UploadFile,authorization: str = Header(None)):
             os.remove(file_location)
         return APIResponse(status='success',message='Embedding Created Success')
     else:
-        HTTPException(401, detail="Unauthorised")
+        return HTTPException(401, detail="Unauthorised")
 
 
 
@@ -63,7 +63,7 @@ def predict(data: PredictionRequest,authorization: str = Header(None)):
 
         return APIResponse(status='success',message=result)
     else:
-        HTTPException(401, detail="Unauthorised")
+        return HTTPException(401, detail="Unauthorised")
 
 
 
@@ -71,7 +71,8 @@ def predict(data: PredictionRequest,authorization: str = Header(None)):
 def feedback(data: FeedbackRequest,authorization: str = Header(None)):
     auth=decodeJWT(authorization)
     if (auth['valid']):
-        with open(Param.FEEDBACK_LOG_FILE, 'a') as log_file:
+        print('f')
+        with open(Param.FEEDBACK_LOG_FILE+'feedback_'+auth['data']['username']+'.txt', 'a+') as log_file:
             log_file.write(f"User_Timestamp: {data.user_timestamp} | User_Input: {data.chat_history[len(data.chat_history)-2]}\n")
             log_file.write(f"Bot_Timestamp: {data.bot_timestamp} | Bot_Response: {data.chat_history[-1]}\n")
             log_file.write(f"Feedback_Timestamp: {data.feedback_timestamp} | User_Feedback: {data.feedback}\n")
@@ -79,7 +80,8 @@ def feedback(data: FeedbackRequest,authorization: str = Header(None)):
 
         return APIResponse(status='success',message='Feedback Noted')
     else:
-        HTTPException(401, detail="Unauthorised")
+        print('ff')
+        return HTTPException(401, detail="Unauthorised")
 
 
 
