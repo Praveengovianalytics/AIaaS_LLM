@@ -1,12 +1,12 @@
-from fastapi import FastAPI
+from fastapi import APIRouter
 from ctransformers import AutoModelForCausalLM,AutoTokenizer
-import uvicorn
 import json
+router = APIRouter()
 
-app = FastAPI()
-
-
-@app.get("/generate_response")
+@router.get("/ping")
+def health_check():
+    return {"status":'healthy'}
+@router.get("/generate_response")
 def generate_response(prompt_input: str, temperature: float, top_p: float, user_assistant: str):
     print("user_assistant-",user_assistant)
     user_assistant1 = user_assistant.replace("'", '"')
@@ -47,9 +47,3 @@ def generate_llama2_response(chat_model, prompt_input, user_assistant,tokenizer)
         response.append(decoded_response)
 
     return response
-
-
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-
