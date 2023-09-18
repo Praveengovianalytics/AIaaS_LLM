@@ -30,6 +30,7 @@ def health_check():
 
 @router.post("/create_embedding")
 def create_embedding(file: UploadFile):
+
     user_folder=Param.EMBEDDING_MODEL_PATH+"zhuofan.chen/"
     if os.path.exists(user_folder):
         shutil.rmtree(user_folder)

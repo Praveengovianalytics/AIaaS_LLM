@@ -1,10 +1,12 @@
 from fastapi import APIRouter, HTTPException
 from ctransformers import AutoModelForCausalLM, AutoTokenizer
 import json
-from core.schema.Login import Login, LoginResponse
+from core.schema.login_transaction import Login, LoginResponse
 import bcrypt
 
 from core.settings import Param
+
+from src.core.controller.authentication_layer.jwt import signJWT
 
 router = APIRouter()
 
@@ -24,7 +26,7 @@ def validate_password(username: str, stored_hash: str, provided_password: str) -
     """Check if a provided password matches the stored hash."""
     result = bcrypt.checkpw(provided_password.encode('utf-8'), stored_hash.encode('utf-8'))
     if result:
-        return LoginResponse(status='success', username=username)
+        return LoginResponse(status='success', username=username,token=signJWT(username))
 
     else:
         return LoginResponse(status='fail')
