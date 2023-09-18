@@ -1,6 +1,12 @@
 from fastapi import FastAPI
 import uvicorn
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.llms import CTransformers
+
 from router.v1 import api as v1route
+from core.settings import Param
+
+
 
 app = FastAPI()
 
