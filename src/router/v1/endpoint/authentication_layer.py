@@ -7,12 +7,16 @@ import bcrypt
 from core.settings import Param
 
 from src.core.controller.authentication_layer.jwt import signJWT
+from core.limiter import limiter
+from starlette.requests import Request
+from starlette.responses import Response
 
 router = APIRouter()
 
 
 @router.post("/login", response_model=LoginResponse)
-def login_user(data: Login):
+@limiter.limit("5/second")
+def login_user(request:Request,response:Response,data: Login):
     with open(Param.AUTH_HASH_PASS_FILE, 'r') as f:
         lines = f.readlines()
         for line in lines:
@@ -33,7 +37,8 @@ def validate_password(username: str, stored_hash: str, provided_password: str) -
 
 
 @router.post("/register", response_model=LoginResponse)
-def register_user(data: Login):
+@limiter.limit("5/second")
+def register_user(request:Request,response:Response,data: Login):
     with open(Param.AUTH_HASH_PASS_FILE, 'r') as f:
         lines = f.readlines()
         for line in lines:
