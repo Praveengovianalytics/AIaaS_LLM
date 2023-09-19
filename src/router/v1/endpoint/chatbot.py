@@ -39,10 +39,14 @@ def create_embedding(file: UploadFile,authorization: str = Header(None)):
             shutil.rmtree(user_folder)
         else:
             os.makedirs(user_folder)
+
+
+
         file_location = f"{Param.TEMP_SAVE_PATH}/{file.filename}"
+
         with open(file_location, "wb+") as file_object:
             file_object.write(file.file.read())
-        embedding=EmbeddingPipeline(file_location,+auth['data']['username'])
+        embedding=EmbeddingPipeline(file_location,auth['data']['username'])
         embedding.save_db_local()
         if os.path.isfile(file_location):
             os.remove(file_location)
@@ -71,8 +75,7 @@ def predict(data: PredictionRequest,authorization: str = Header(None)):
 def feedback(data: FeedbackRequest,authorization: str = Header(None)):
     auth=decodeJWT(authorization)
     if (auth['valid']):
-        print('f')
-        with open(Param.FEEDBACK_LOG_FILE+'feedback_'+auth['data']['username']+'.txt', 'a+') as log_file:
+        with open(Param.FEEDBACK_LOG_FILE+'feedback_'+auth['data']['username']+'.txt', 'a+', encoding="utf-8") as log_file:
             log_file.write(f"User_Timestamp: {data.user_timestamp} | User_Input: {data.chat_history[len(data.chat_history)-2]}\n")
             log_file.write(f"Bot_Timestamp: {data.bot_timestamp} | Bot_Response: {data.chat_history[-1]}\n")
             log_file.write(f"Feedback_Timestamp: {data.feedback_timestamp} | User_Feedback: {data.feedback}\n")
@@ -80,7 +83,6 @@ def feedback(data: FeedbackRequest,authorization: str = Header(None)):
 
         return APIResponse(status='success',message='Feedback Noted')
     else:
-        print('ff')
         return HTTPException(401, detail="Unauthorised")
 
 
