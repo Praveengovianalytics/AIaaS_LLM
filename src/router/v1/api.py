@@ -4,5 +4,5 @@ from router.v1.endpoint import authentication_layer as authentication
 
 v1_router = APIRouter()
 
-v1_router.include_router(chatbot.router, prefix='/chat')
-v1_router.include_router(authentication.router, prefix='/auth')
+v1_router.include_router(chatbot.router, prefix="/chat")
+v1_router.include_router(authentication.router, prefix="/auth")

@@ -1,7 +1,10 @@
 from pydantic import BaseModel
-from fastapi import FastAPI
 
 
 class PredictionRequest(BaseModel):
+    """
+    Prediction Request Model
+    """
+
     query: str
-    chat_history:list
+    chat_history: list

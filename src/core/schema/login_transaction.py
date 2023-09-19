@@ -1,13 +1,20 @@
 from pydantic import BaseModel
-from fastapi import FastAPI
 
 
 class Login(BaseModel):
+    """
+    Login Request Model
+    """
+
     username: str
     password: str
 
 
 class LoginResponse(BaseModel):
+    """
+    Login Response Model
+    """
+
     status: str
     username: str | None = None
-    token: str | None=None
+    token: str | None = None

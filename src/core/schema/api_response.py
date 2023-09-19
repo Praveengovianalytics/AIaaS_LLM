@@ -2,5 +2,9 @@ from pydantic import BaseModel
 
 
 class APIResponse(BaseModel):
-    status:str
-    message:str
+    """
+    API Response Model
+    """
+
+    status: str
+    message: str
