@@ -102,21 +102,31 @@ def set_model(request: Request, response: Response, data: ModelRequest, authoriz
     auth = decodeJWT(authorization)
     if auth["valid"]:
         try:
-            exist = ''
-            for i in user_model_cache.keys():
-                if data.config.items() == user_model_cache[i]['config'].items():
-                    exist = i
-                    print('Exist Model in Cache')
+            if (data.config.items() == {
+                "max_new_tokens": Param.LLM_MAX_NEW_TOKENS,
+                "temperature": Param.LLM_TEMPERATURE,
+                "top_k": Param.TOP_K,
+                "top_p": Param.TOP_P,
+                "batch_size": Param.BATCH_SIZE
 
-            if exist == '':
-                custom_llm = CTransformers(
-                    model=Param.LLM_MODEL_PATH,
-                    model_type=Param.LLM_MODEL_TYPE,
-                    config=data.config
+            }.items()):
+                pass
+            else:
+                exist = ''
+                for i in user_model_cache.keys():
+                    if data.config.items() == user_model_cache[i]['config'].items():
+                        exist = i
+                        print('Exist Model in Cache')
 
-                )
-                user_model_cache[auth["data"]["username"]] = {'model': custom_llm, 'config': data.config}
-                print('Created New Model in Cache')
+                if exist == '':
+                    custom_llm = CTransformers(
+                        model=Param.LLM_MODEL_PATH,
+                        model_type=Param.LLM_MODEL_TYPE,
+                        config=data.config
+
+                    )
+                    user_model_cache[auth["data"]["username"]] = {'model': custom_llm, 'config': data.config}
+                    print('Created New Model in Cache')
 
             return APIResponse(status="success", message='Model Initialisation Success')
         except Exception as e:
