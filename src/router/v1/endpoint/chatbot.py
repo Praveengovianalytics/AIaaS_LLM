@@ -43,6 +43,7 @@ llm = CTransformers(
 )
 router = APIRouter()
 
+
 @router.get("/get_configure")
 @limiter.limit("5/second")
 def get_configuration(request: Request, response: Response):
@@ -57,7 +58,7 @@ def get_configuration(request: Request, response: Response):
     Returns:
         A dictionary with a key of &quot;status&quot; and a value of &quot;healthy&quot;
     """
-    return {"status": "success","config":{
+    return {"status": "success", "config": {
         "max_new_tokens": Param.LLM_MAX_NEW_TOKENS,
         "temperature": Param.LLM_TEMPERATURE,
         "top_k": Param.TOP_K,
@@ -65,7 +66,6 @@ def get_configuration(request: Request, response: Response):
         "batch_size": Param.BATCH_SIZE
 
     }}
-
 
 
 @router.get("/ping")
@@ -85,10 +85,10 @@ def health_check(request: Request, response: Response):
     return {"status": "healthy"}
 
 
-@router.get("/set_model")
+@router.post("/set_model")
 @limiter.limit("5/second")
-def set_model(request: Request, response: Response, data: ModelRequest,        authorization: str = Header(None),
-):
+def set_model(request: Request, response: Response, data: ModelRequest, authorization: str = Header(None),
+              ):
     """
     The set_model function is a simple function that initialise the model for user.
         ---
@@ -102,20 +102,20 @@ def set_model(request: Request, response: Response, data: ModelRequest,        a
     auth = decodeJWT(authorization)
     if auth["valid"]:
         try:
-            exist=''
+            exist = ''
             for i in user_model_cache.keys():
                 if data.config.items() == user_model_cache[i]['config'].items():
-                    exist=i
+                    exist = i
                     print('Exist Model in Cache')
 
-            if exist=='':
+            if exist == '':
                 custom_llm = CTransformers(
                     model=Param.LLM_MODEL_PATH,
                     model_type=Param.LLM_MODEL_TYPE,
                     config=data.config
 
                 )
-                user_model_cache[auth["data"]["username"]]={'model':custom_llm,'config':data.config}
+                user_model_cache[auth["data"]["username"]] = {'model': custom_llm, 'config': data.config}
                 print('Created New Model in Cache')
 
             return APIResponse(status="success", message='Model Initialisation Success')
@@ -163,12 +163,14 @@ def create_embedding(
     else:
         return HTTPException(401, detail="Unauthorised")
 
-def retrieve_model(data,username):
+
+def retrieve_model(data, username):
+    print(user_model_cache.keys())
     if data.use_default == 1:
         llms = llm
         return llms
     else:
-        if (hasattr(user_model_cache,username)):
+        if (username in user_model_cache.keys() ):
             print('Exist Model in Cache')
 
             return user_model_cache[username]['model']
@@ -189,7 +191,6 @@ def retrieve_model(data,username):
             user_model_cache[username] = {'model': custom_llm, 'config': data.config}
             print('Created New Model in Cache')
             return user_model_cache[username]['model']
-
 
 
 @router.post("/predict")
@@ -217,11 +218,11 @@ def predict(
         retriever = load_embedding(
             Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/"
         )
-        llms=retrieve_model(data,auth["data"]["username"])
+        llms = retrieve_model(data, auth["data"]["username"])
         chain = ConversationalRetrievalChain.from_llm(
             llm=llms, retriever=retriever.as_retriever()
         )
-        result = LLM(chain, llm, retriever).predict(data.query, data.chat_history)
+        result = LLM(chain, llms, retriever).predict(data.query, data.chat_history)
 
         return APIResponse(status="success", message=result)
     else:
