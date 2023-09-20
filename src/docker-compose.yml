@@ -1,0 +1,13 @@
+version: '3'
+services:
+  llm_app:
+    build:
+      context: .
+    container_name: BTO_LLM_App
+    ports:
+      - "8501:8501"
+
+    deploy:
+      resources:
+        limits:
+          memory: 4G
