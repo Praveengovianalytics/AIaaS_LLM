@@ -62,7 +62,7 @@ def get_configuration(request: Request, response: Response):
         "temperature": Param.LLM_TEMPERATURE,
         "top_k": Param.TOP_K,
         "top_p": Param.TOP_P,
-        "batch_size": 16
+        "batch_size": Param.BATCH_SIZE
 
     }}
 
