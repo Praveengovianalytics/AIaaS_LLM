@@ -1,5 +1,6 @@
 import os
 
+import cachetools
 from fastapi import APIRouter, Header, HTTPException
 
 import shutil
@@ -22,13 +23,49 @@ from core.limiter import limiter
 from starlette.requests import Request
 from starlette.responses import Response
 
+from src.core.schema.prediction_request import ModelRequest
+
+## Use In-Memory Ram
+user_model_cache = cachetools.LRUCache(maxsize=20)
+
 llm = CTransformers(
     model=Param.LLM_MODEL_PATH,
     model_type=Param.LLM_MODEL_TYPE,
-    max_new_tokens=Param.LLM_MAX_NEW_TOKENS,
-    temperature=Param.LLM_TEMPERATURE,
+    config={
+        "max_new_tokens": Param.LLM_MAX_NEW_TOKENS,
+        "temperature": Param.LLM_TEMPERATURE,
+        "top_k": Param.TOP_K,
+        "top_p": Param.TOP_P,
+        "batch_size": Param.BATCH_SIZE
+
+    }
+
 )
 router = APIRouter()
+
+@router.get("/get_configure")
+@limiter.limit("5/second")
+def get_configuration(request: Request, response: Response):
+    """
+    The get_configuration function is a simple function that returns the configuration of the Model.
+        ---
+        description: Returns the configuration of this API.
+        responses:
+          200:  # HTTP Status code 200 means &quot;OK&quot; (the request was fulfilled)
+            description: The health check passed and this API is healthy!
+
+    Returns:
+        A dictionary with a key of &quot;status&quot; and a value of &quot;healthy&quot;
+    """
+    return {"status": "success","config":{
+        "max_new_tokens": Param.LLM_MAX_NEW_TOKENS,
+        "temperature": Param.LLM_TEMPERATURE,
+        "top_k": Param.TOP_K,
+        "top_p": Param.TOP_P,
+        "batch_size": 16
+
+    }}
+
 
 
 @router.get("/ping")
@@ -48,13 +85,52 @@ def health_check(request: Request, response: Response):
     return {"status": "healthy"}
 
 
+@router.get("/set_model")
+@limiter.limit("5/second")
+def set_model(request: Request, response: Response, data: ModelRequest,        authorization: str = Header(None),
+):
+    """
+    The set_model function is a simple function that initialise the model for user.
+        ---
+        description: Returns the health of this API.
+        responses:
+          200:  # HTTP Status code 200 means &quot;OK&quot; (the request was fulfilled)
+
+    Returns:
+        A dictionary with a key of &quot;status&quot; and a value of &quot;healthy&quot;
+    """
+    auth = decodeJWT(authorization)
+    if auth["valid"]:
+        try:
+            exist=''
+            for i in user_model_cache.keys():
+                if data.config.items() == user_model_cache[i]['config'].items():
+                    exist=i
+                    print('Exist Model in Cache')
+
+            if exist=='':
+                custom_llm = CTransformers(
+                    model=Param.LLM_MODEL_PATH,
+                    model_type=Param.LLM_MODEL_TYPE,
+                    config=data.config
+
+                )
+                user_model_cache[auth["data"]["username"]]={'model':custom_llm,'config':data.config}
+                print('Created New Model in Cache')
+
+            return APIResponse(status="success", message='Model Initialisation Success')
+        except Exception as e:
+            print(e)
+            return APIResponse(status="fail", message='Model Initialisation Failed')
+
+
 @router.post("/create_embedding")
 @limiter.limit("5/second")
 def create_embedding(
-    request: Request,
-    response: Response,
-    file: UploadFile,
-    authorization: str = Header(None),
+        request: Request,
+        response: Response,
+        file: UploadFile,
+        authorization: str = Header(None),
 ):
     """
     The create_embedding function creates a new embedding file.
@@ -87,14 +163,42 @@ def create_embedding(
     else:
         return HTTPException(401, detail="Unauthorised")
 
+def retrieve_model(data,username):
+    if data.use_default == 1:
+        llms = llm
+        return llms
+    else:
+        if (hasattr(user_model_cache,username)):
+            print('Exist Model in Cache')
+
+            return user_model_cache[username]['model']
+        else:
+
+            for i in user_model_cache.keys():
+                if data.config.items() == user_model_cache[i]['config'].items():
+                    print('Exist Model in Cache')
+                    llms = user_model_cache[i]['model']
+                    return llms
+
+            custom_llm = CTransformers(
+                model=Param.LLM_MODEL_PATH,
+                model_type=Param.LLM_MODEL_TYPE,
+                config=data.config
+
+            )
+            user_model_cache[username] = {'model': custom_llm, 'config': data.config}
+            print('Created New Model in Cache')
+            return user_model_cache[username]['model']
+
+
 
 @router.post("/predict")
 @limiter.limit("5/second")
 def predict(
-    request: Request,
-    response: Response,
-    data: PredictionRequest,
-    authorization: str = Header(None),
+        request: Request,
+        response: Response,
+        data: PredictionRequest,
+        authorization: str = Header(None),
 ):
     """
     The predict function is the main function of this API. It takes in a query and chat history,
@@ -113,8 +217,9 @@ def predict(
         retriever = load_embedding(
             Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/"
         )
+        llms=retrieve_model(data,auth["data"]["username"])
         chain = ConversationalRetrievalChain.from_llm(
-            llm=llm, retriever=retriever.as_retriever()
+            llm=llms, retriever=retriever.as_retriever()
         )
         result = LLM(chain, llm, retriever).predict(data.query, data.chat_history)
 
@@ -126,10 +231,10 @@ def predict(
 @router.post("/feedback")
 @limiter.limit("5/second")
 def feedback(
-    request: Request,
-    response: Response,
-    data: FeedbackRequest,
-    authorization: str = Header(None),
+        request: Request,
+        response: Response,
+        data: FeedbackRequest,
+        authorization: str = Header(None),
 ):
     """
     The feedback function is used to log the user's feedback on a particular interaction with the bot.
@@ -147,12 +252,12 @@ def feedback(
     auth = decodeJWT(authorization)
     if auth["valid"]:
         with open(
-            Param.FEEDBACK_LOG_FILE + "feedback_" + auth["data"]["username"] + ".txt",
-            "a+",
-            encoding="utf-8",
+                Param.FEEDBACK_LOG_FILE + "feedback_" + auth["data"]["username"] + ".txt",
+                "a+",
+                encoding="utf-8",
         ) as log_file:
             log_file.write(
-                f"User_Timestamp: {data.user_timestamp} | User_Input: {data.chat_history[len(data.chat_history)-2]}\n"
+                f"User_Timestamp: {data.user_timestamp} | User_Input: {data.chat_history[len(data.chat_history) - 2]}\n"
             )
             log_file.write(
                 f"Bot_Timestamp: {data.bot_timestamp} | Bot_Response: {data.chat_history[-1]}\n"

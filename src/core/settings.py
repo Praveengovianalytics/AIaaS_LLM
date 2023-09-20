@@ -6,8 +6,11 @@ class Param:
     CHAT_LOG_PATH = "logs/feedback_log.txt"
     LLM_MODEL_PATH = f"{APP_PATH}models/llama-2-7b-chat.ggmlv3.q4_K_S.bin"
     LLM_MODEL_TYPE = "llama"
-    LLM_MAX_NEW_TOKENS = 512
+    LLM_MAX_NEW_TOKENS = 256
     LLM_TEMPERATURE = 0.5
+    BATCH_SIZE = 8
+    TOP_K = 40
+    TOP_P=0.95
     EMBEDDING_MODEL_PATH = f"{APP_PATH}models/all-MiniLM-L6-v2"
     EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
     EMBEDDING_DEVICE = "cpu"
