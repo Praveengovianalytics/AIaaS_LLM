@@ -129,8 +129,7 @@ def set_model(request: Request, response: Response, data: ModelRequest, authoriz
                     print('Created New Model in Cache')
 
             return APIResponse(status="success", message='Model Initialisation Success')
-        except Exception as e:
-            print(e)
+        except Exception:
             return APIResponse(status="fail", message='Model Initialisation Failed')
 
 

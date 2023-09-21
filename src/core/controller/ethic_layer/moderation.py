@@ -5,6 +5,8 @@ from langchain import PromptTemplate, LLMChain
 from langchain.llms import BaseLLM
 from langchain.schema.language_model import BaseLanguageModel
 
+from core.settings import Param
+
 
 def output_moderation(
     context: str = None,
@@ -44,7 +46,7 @@ def output_moderation(
             print("moderation check fail")
             return False
         else:
-            with open("core/controller/ethic_layer/en.txt") as f:
+            with open(Param.APP_PATH+"src/core/controller/ethic_layer/en.txt") as f:
                 lines = [line.rstrip() for line in f]
 
             for line in lines:
