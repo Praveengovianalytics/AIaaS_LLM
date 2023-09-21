@@ -23,7 +23,7 @@ from core.limiter import limiter
 from starlette.requests import Request
 from starlette.responses import Response
 
-from src.core.schema.prediction_request import ModelRequest
+from core.schema.prediction_request import ModelRequest
 
 ## Use In-Memory Ram
 user_model_cache = cachetools.LRUCache(maxsize=20)

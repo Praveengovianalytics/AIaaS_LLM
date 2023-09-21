@@ -5,7 +5,7 @@ import bcrypt
 
 from core.settings import Param
 
-from src.core.controller.authentication_layer.jwt import signJWT
+from core.controller.authentication_layer.jwt import signJWT
 from core.limiter import limiter
 from starlette.requests import Request
 from starlette.responses import Response

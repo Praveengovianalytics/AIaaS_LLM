@@ -2,7 +2,7 @@ import datetime
 from typing import Dict
 
 import jwt
-from src.core.settings import Param
+from core.settings import Param
 
 
 def signJWT(username: str) -> Dict[str, str]:
