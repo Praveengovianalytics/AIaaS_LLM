@@ -16,7 +16,6 @@ aiohttp = "3.8.4"
 huggingface-hub = "0.17.1"
 pyjwt='2.8.0'
 langchain = "0.0.251"
-nemoguardrails = "0.4.0"
 pydantic-core = "2.6.3"
 sentence-transformers = "2.2.2"
 uvicorn = "0.22.0"

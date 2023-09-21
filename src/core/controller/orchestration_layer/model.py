@@ -5,11 +5,6 @@ from langchain.chains.conversational_retrieval.base import (
     BaseConversationalRetrievalChain,
 )
 from langchain.schema.language_model import BaseLanguageModel
-from nemoguardrails.llm.providers import register_llm_provider
-
-from nemoguardrails.llm.taskmanager import LLMTaskManager
-from nemoguardrails.rails.llm.config import Model, RailsConfig
-
 from core.controller.ethic_layer.fact_checking import fact_checking
 from core.controller.ethic_layer.jailbreak import check_jailbreak
 
@@ -41,10 +36,7 @@ class LLM:
         self.chain = chain
         self.llm = llm
         self.retriever = retriever
-        register_llm_provider("custom_llm", llm)
-        model_config = Model(type="main", engine="customllm")
-        rails_config = RailsConfig(models=[model_config])
-        self.llm_task_manager = LLMTaskManager(rails_config)
+
 
     def pre_check(self, query: str = None):
         """
