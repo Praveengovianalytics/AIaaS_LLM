@@ -24,4 +24,4 @@ app.include_router(v1route.v1_router, prefix="/v1")
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=port_set)
+    uvicorn.run(app, host=Param.RUNNING_ADDRESS, port=port_set)
