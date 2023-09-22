@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--port', dest='port', type=int, help='Port Number')
 args = parser.parse_args()
 
-port_set=Param.PORT_NUMBER if !args.port else args.port
+port_set=Param.PORT_NUMBER if not args.port else args.port
 
 app = FastAPI()
 app.state.limiter = limiter
