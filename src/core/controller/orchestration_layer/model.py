@@ -104,7 +104,7 @@ class LLM:
                     "about the query from the data provided. "
                     "\n "
                     " User query:" + query,
-                    "chat_history": chat_history,
+                    "chat_history": [tuple(sublist) for sublist in chat_history],
                 }
             )
             print(result)
