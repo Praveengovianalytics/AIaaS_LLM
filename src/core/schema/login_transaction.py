@@ -16,5 +16,5 @@ class LoginResponse(BaseModel):
     """
 
     status: str
-    username: str | None = None
-    token: str | None = None
+    username: str
+    token: str
