@@ -44,6 +44,23 @@ python main.py --port <port-number>
 
 ```
 
+
+OR
+
+Set Port Number In src/core/settings.py:
+```bash
+PORT_NUMBER=8000
+
+```
+
+Then run:
+```bash
+python main.py 
+
+```
+
+Note: Direct Calling Through Args On Running Will Be Prioritised
+
 ## Version your data
 To track changes to the "data" directory, type:
 ```bash
