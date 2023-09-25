@@ -1,7 +1,7 @@
 import os
 
 import cachetools
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Header, HTTPException, Form
 
 import shutil
 
@@ -138,7 +138,7 @@ def set_model(request: Request, response: Response, data: ModelRequest, authoriz
 def create_embedding(
         request: Request,
         response: Response,
-        file: UploadFile,
+        file: UploadFile= Form(...), extension: str = Form(...),
         authorization: str = Header(None),
 ):
     """
@@ -164,7 +164,7 @@ def create_embedding(
 
         with open(file_location, "wb+") as file_object:
             file_object.write(file.file.read())
-        embedding = EmbeddingPipeline(file_location, auth["data"]["username"])
+        embedding = EmbeddingPipeline(file_location, auth["data"]["username"],extension)
         embedding.save_db_local()
         if os.path.isfile(file_location):
             os.remove(file_location)
@@ -179,7 +179,7 @@ def retrieve_model(data, username):
         llms = llm
         return llms
     else:
-        if (username in user_model_cache.keys() ):
+        if (username in user_model_cache.keys()):
             print('Exist Model in Cache')
 
             return user_model_cache[username]['model']

@@ -1,9 +1,13 @@
 from langchain.document_loaders.csv_loader import CSVLoader
+from langchain.document_loaders import PyPDFLoader, JSONLoader, UnstructuredMarkdownLoader, UnstructuredHTMLLoader, \
+    TextLoader, Docx2txtLoader
+
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 import sys
-from core.settings import Param
 
+from core.controller.orchestration_layer.JSONLoad import JSONLoad
+from core.settings import Param
 
 sys.path.append("..")
 
@@ -18,7 +22,7 @@ class EmbeddingPipeline:
     class to generate Embedding using FAISS
     """
 
-    def __init__(self, tmp_file_path, user):
+    def __init__(self, tmp_file_path, user, file_extension):
         """
         The __init__ function is called when the class is instantiated.
         It sets up the instance of the class with all of its attributes and methods.
@@ -34,11 +38,12 @@ class EmbeddingPipeline:
             Nothing
         """
         self.tmp_file_path = tmp_file_path
-        self.data = self.load_data_from_csv()
+        self.file_extension = file_extension.lower()
+        self.data = self.load_data()
         self.user = user
         self.db = self.create_db_from_documents()
 
-    def load_data_from_csv(self):
+    def load_data(self):
         """
         The load_data_from_csv function loads data from a CSV file.
 
@@ -48,14 +53,30 @@ class EmbeddingPipeline:
         Returns:
             A dataframe object
 
-        Doc Author:
-            Trelent
         """
-        loader = CSVLoader(
-            file_path=self.tmp_file_path,
-            encoding=Param.CSV_ENCODING,
-            csv_args={"delimiter": Param.CSV_DELIMITER},
-        )
+        print(self.file_extension)
+        if (self.file_extension == 'csv'):
+            loader = CSVLoader(
+                file_path=self.tmp_file_path,
+                encoding=Param.CSV_ENCODING,
+                csv_args={"delimiter": Param.CSV_DELIMITER},
+            )
+        elif (self.file_extension == 'pdf'):
+            loader = PyPDFLoader(file_path=self.tmp_file_path)
+        elif (self.file_extension == 'json'):
+            loader = JSONLoad(
+                file_path=self.tmp_file_path)
+        elif (self.file_extension == 'md'):
+            loader=UnstructuredMarkdownLoader(file_path=self.tmp_file_path)
+        elif (self.file_extension == 'html'):
+            loader = UnstructuredHTMLLoader(file_path=self.tmp_file_path)
+        elif (self.file_extension == 'docx' or self.file_extension == 'doc'):
+            loader = Docx2txtLoader(file_path=self.tmp_file_path)
+        elif (self.file_extension == 'txt'):
+            loader = TextLoader(file_path=self.tmp_file_path)
+        else:
+            loader = TextLoader(file_path=self.tmp_file_path)
+
         return loader.load()
 
     def create_db_from_documents(self):
