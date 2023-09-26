@@ -90,20 +90,10 @@ class LLM:
         if pre_require["check"] == "pass":
             result = self.chain(
                 {
-                    "question": "Your are a data dictionary bot. Your task is to fully answer the "
+                    "question": query+" \n System: Do note that Your are a data dictionary bot. Your task is to fully answer the "
                     "user's query based on the"
-                    "information provided to you. The user's query will be based on the "
-                    "data provided to you."
-                    "Your response should "
-                    "be comprehensive, evident and provide all the necessary information "
-                    "using the data given to you to"
-                    "explain and address the user query.You do not respond as 'User' or pretend to be 'User'. You only respond once as 'Assistant'. Please ensure that your answer "
-                    "is clear,"
-                    "concise, and accurate, using the provided data and attributes to provide a "
-                    "complete and informative response. Just mention everything you know "
-                    "about the query from the data provided. "
-                    "\n "
-                    " User query:" + query,
+                    "information provided to you."+ "You do not respond as 'User' or pretend to be 'User'. You only response once. Please ensure that your answer is clear"
+                    ,
                     "chat_history": [tuple(sublist) for sublist in chat_history],
                 }
             )

@@ -22,7 +22,7 @@ class EmbeddingPipeline:
     class to generate Embedding using FAISS
     """
 
-    def __init__(self, tmp_file_path, user, file_extension):
+    def __init__(self, file_list, user, file_extension):
         """
         The __init__ function is called when the class is instantiated.
         It sets up the instance of the class with all of its attributes and methods.
@@ -37,11 +37,22 @@ class EmbeddingPipeline:
         Returns:
             Nothing
         """
-        self.tmp_file_path = tmp_file_path
-        self.file_extension = file_extension.lower()
-        self.data = self.load_data()
+        self.file_list=file_list
+        self.db=[]
         self.user = user
-        self.db = self.create_db_from_documents()
+        for index,file in enumerate(file_list):
+            self.tmp_file_path = file
+            self.file_extension = file_extension[index]
+            self.data = self.load_data()
+            self.db.append(self.create_db_from_documents())
+            if index==0:
+                pass
+            else:
+                self.db[len(self.db)-1].merge_from(self.db[len(self.db)-2])
+        self.db=self.db[len(self.db)-1]
+
+
+
 
     def load_data(self):
         """

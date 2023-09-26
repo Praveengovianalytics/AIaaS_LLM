@@ -6,6 +6,7 @@ from fastapi import APIRouter, Header, HTTPException, Form
 import shutil
 
 from langchain.chains import ConversationalRetrievalChain
+from typing import List
 
 from core.controller.orchestration_layer.model import LLM
 from core.schema.api_response import APIResponse
@@ -138,7 +139,7 @@ def set_model(request: Request, response: Response, data: ModelRequest, authoriz
 def create_embedding(
         request: Request,
         response: Response,
-        file: UploadFile= Form(...), extension: str = Form(...),
+        file: List[UploadFile] = Form(...), extension: List[str] = Form(...),
         authorization: str = Header(None),
 ):
     """
@@ -159,15 +160,19 @@ def create_embedding(
             shutil.rmtree(user_folder)
         else:
             os.makedirs(user_folder)
+        file_list=[]
+        for infile in file:
+            file_location = f"{Param.TEMP_SAVE_PATH}/{infile.filename}"
+            with open(file_location, "wb+") as file_object:
+                file_object.write(infile.file.read())
+                file_list.append(file_location)
 
-        file_location = f"{Param.TEMP_SAVE_PATH}/{file.filename}"
-
-        with open(file_location, "wb+") as file_object:
-            file_object.write(file.file.read())
-        embedding = EmbeddingPipeline(file_location, auth["data"]["username"],extension)
+        embedding = EmbeddingPipeline(file_list, auth["data"]["username"],extension)
         embedding.save_db_local()
-        if os.path.isfile(file_location):
-            os.remove(file_location)
+
+        for address in file_list:
+            if os.path.isfile(address):
+                os.remove(address)
         return APIResponse(status="success", message="Embedding Created Success")
     else:
         return HTTPException(401, detail="Unauthorised")
@@ -229,7 +234,7 @@ def predict(
         )
         llms = retrieve_model(data, auth["data"]["username"])
         chain = ConversationalRetrievalChain.from_llm(
-            llm=llms, retriever=retriever.as_retriever()
+            llm=llms, retriever=retriever.as_retriever(search_type="mmr", search_kwargs={'k': 2, 'fetch_k': 50}),verbose=True
         )
         result = LLM(chain, llms, retriever).predict(data.query, data.chat_history)
 

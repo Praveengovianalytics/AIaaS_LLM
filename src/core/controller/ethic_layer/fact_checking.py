@@ -24,7 +24,7 @@ def fact_checking(
     """
     fact = retriver.similarity_search(inputs)
     evidence = ""
-    for i in range(len(fact)):
+    for i in range(2 if len(fact)>2 else len(fact)):
         evidence = (
             evidence + "Evidence " + str(i) + ": " + fact[i].page_content + ". \n"
         )
