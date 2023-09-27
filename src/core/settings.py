@@ -8,11 +8,18 @@ class Param:
     CHAT_LOG_PATH = "logs/feedback_log.txt"
     LLM_MODEL_PATH = f"{APP_PATH}models/llama-2-7b-chat.ggmlv3.q4_K_S.bin"
     LLM_MODEL_TYPE = "llama"
+    # Default Model Configuration
     LLM_MAX_NEW_TOKENS = 1200
     LLM_TEMPERATURE = 0.4
     BATCH_SIZE = 256
     TOP_K = 40
     TOP_P=0.95
+    LLM_CONTEXT_LENGTH=4000
+    # Prompt and Fetching Settings
+    FETCH_INDEX=50
+    SELECT_INDEX=2
+    SYSTEM_PROMPT=("Do note that Your are a data dictionary bot. Your task is to fully answer the user's query based "
+                   "on the information provided to you.")
     EMBEDDING_MODEL_PATH = f"{APP_PATH}models/all-MiniLM-L6-v2"
     EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
     EMBEDDING_DEVICE = "cpu"

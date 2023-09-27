@@ -9,6 +9,7 @@ from core.controller.ethic_layer.fact_checking import fact_checking
 from core.controller.ethic_layer.jailbreak import check_jailbreak
 
 from core.controller.ethic_layer.moderation import moderation_check
+from core.settings import Param
 
 
 class LLM:
@@ -69,7 +70,7 @@ class LLM:
         result = moderation_check(check1["content"], llm)
         return result
 
-    def predict(self, query: str = None, chat_history: list = None):
+    def predict(self, query: str = None, chat_history: list = None,intial_prompt:str=None):
         """
         The predict function takes in a query and chat history, and returns an answer.
         The predict function is the main function of the bot. It takes in a user's query as well as
@@ -90,9 +91,7 @@ class LLM:
         if pre_require["check"] == "pass":
             result = self.chain(
                 {
-                    "question": query+" \n System: Do note that Your are a data dictionary bot. Your task is to fully answer the "
-                    "user's query based on the"
-                    "information provided to you."+ "You do not respond as 'User' or pretend to be 'User'. You only response once. Please ensure that your answer is clear"
+                    "question": query+" \n System: "+(str(intial_prompt) if str(intial_prompt) else Param.SYSTEM_PROMPT)+ "You do not respond as 'User' or pretend to be 'User'. You only response once. Please ensure that your answer is clear"
                     ,
                     "chat_history": [tuple(sublist) for sublist in chat_history],
                 }

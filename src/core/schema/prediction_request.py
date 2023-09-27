@@ -15,3 +15,4 @@ class PredictionRequest(BaseModel):
     chat_history: list
     use_default:int
     config:dict
+    conversation_config:dict

@@ -37,7 +37,8 @@ llm = CTransformers(
         "temperature": Param.LLM_TEMPERATURE,
         "top_k": Param.TOP_K,
         "top_p": Param.TOP_P,
-        "batch_size": Param.BATCH_SIZE
+        "batch_size": Param.BATCH_SIZE,
+        "context_length":Param.LLM_CONTEXT_LENGTH
 
     }
 
@@ -68,6 +69,28 @@ def get_configuration(request: Request, response: Response):
 
     }}
 
+
+
+@router.get("/get_configure_chat")
+@limiter.limit("5/second")
+def get_configuration_chat(request: Request, response: Response):
+    """
+    The get_configuration function is a simple function that returns the configuration of the Model.
+        ---
+        description: Returns the configuration of this API.
+        responses:
+          200:  # HTTP Status code 200 means &quot;OK&quot; (the request was fulfilled)
+            description: The health check passed and this API is healthy!
+
+    Returns:
+        A dictionary with a key of &quot;status&quot; and a value of &quot;healthy&quot;
+    """
+    return {"status": "success", "config": {
+        "fetch_k": Param.FETCH_INDEX,
+        "k": Param.SELECT_INDEX,
+        "bot_context_prompt": Param.SYSTEM_PROMPT
+
+    }}
 
 @router.get("/ping")
 @limiter.limit("5/second")
@@ -120,6 +143,7 @@ def set_model(request: Request, response: Response, data: ModelRequest, authoriz
                         print('Exist Model in Cache')
 
                 if exist == '':
+                    data.config['context_length']=Param.LLM_CONTEXT_LENGTH
                     custom_llm = CTransformers(
                         model=Param.LLM_MODEL_PATH,
                         model_type=Param.LLM_MODEL_TYPE,
@@ -196,6 +220,7 @@ def retrieve_model(data, username):
                     llms = user_model_cache[i]['model']
                     return llms
 
+            data.config['context_length']=Param.LLM_CONTEXT_LENGTH
             custom_llm = CTransformers(
                 model=Param.LLM_MODEL_PATH,
                 model_type=Param.LLM_MODEL_TYPE,
@@ -234,9 +259,9 @@ def predict(
         )
         llms = retrieve_model(data, auth["data"]["username"])
         chain = ConversationalRetrievalChain.from_llm(
-            llm=llms, retriever=retriever.as_retriever(search_type="mmr", search_kwargs={'k': 2, 'fetch_k': 50}),verbose=True
+            llm=llms, retriever=retriever.as_retriever(search_type="mmr", search_kwargs={'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX), 'fetch_k': (data.conversation_config['fetch_k'] if data.conversation_config['fetch_k'] else Param.FETCH_INDEX)}),verbose=True
         )
-        result = LLM(chain, llms, retriever).predict(data.query, data.chat_history)
+        result = LLM(chain, llms, retriever).predict(data.query, data.chat_history,data.conversation_config['bot_context_setting'])
 
         return APIResponse(status="success", message=result)
     else:
