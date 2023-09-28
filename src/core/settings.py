@@ -15,6 +15,9 @@ class Param:
     TOP_K = 40
     TOP_P=0.95
     LLM_CONTEXT_LENGTH=4000
+    # Ethic Control
+    POST_CONTROL=False
+    JAILBREAK_CONTROL=False
     # Prompt and Fetching Settings
     FETCH_INDEX=50
     SELECT_INDEX=2

@@ -86,8 +86,9 @@ class LLM:
             A dictionary with the key &quot;answer&quot; and value as the answer
 
         """
-        pre_require = self.pre_check(query)
-        print(pre_require)
+        pre_require = self.pre_check(query) if Param.JAILBREAK_CONTROL else {'check':'pass'}
+
+
         if pre_require["check"] == "pass":
             result = self.chain(
                 {
@@ -100,7 +101,7 @@ class LLM:
         else:
             return pre_require["content"]
 
-        postcheck = self.post_check(result["answer"], self.llm)
+        postcheck = self.post_check(result["answer"], self.llm) if Param.POST_CONTROL else {'content':result['answer']}
         print(postcheck)
 
         return postcheck["content"]
