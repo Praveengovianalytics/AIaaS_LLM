@@ -16,7 +16,7 @@ jobs:
             host: 34.173.56.83
             username: "praveengovi_nlp"
             key: ${{secrets.AIAAS_LLM_ACTIONS_KEY}}
-            script: 
+            script: |
                     cd ~/AIaaS_Projects/AIaas_LLM/AIaaS_LLM/ 
                     git pull
                     cd ~
