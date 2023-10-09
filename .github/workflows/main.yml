@@ -14,8 +14,8 @@ jobs:
       uses: appleboy/ssh-action@v1.0.0
       with:
             host: 34.173.56.83
-            username: praveengovi_nlp
-            key: 
+            username: "praveengovi_nlp"
+            key: >
                     -----BEGIN OPENSSH PRIVATE KEY-----
                     b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
                     NhAAAAAwEAAQAAAQEAyEyZ2SIWcO10iCnXy2LG142Z3vSXhRMecwm3Zbhc9w02DmdbgRJs
@@ -43,7 +43,6 @@ jobs:
                     p/CmelzDoBUPInr9/JkloCSw72PfJyalTpuZzInpY0Oirqid4fNI9Dl6U8RsJeX1KchEdo
                     6kGixM7LQCLzv1sAAAAPcHJhdmVlbmdvdmlfbmxwAQIDBA==
                     -----END OPENSSH PRIVATE KEY-----
-            port: 22
             script: 
                     cd ~/AIaaS_Projects/AIaas_LLM/AIaaS_LLM/ 
                     git pull
