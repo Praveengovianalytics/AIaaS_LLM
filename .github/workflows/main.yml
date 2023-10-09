@@ -24,4 +24,4 @@ jobs:
                     conda deactivate
                     source virtual_envs/venv_aiaas_llm/bin/activate
                     cd ~
-                    ./start_aiaas_llam_api.py
+                    ./start_aiaas_llam_api.sh
