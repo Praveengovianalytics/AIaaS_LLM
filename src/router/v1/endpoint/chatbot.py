@@ -278,20 +278,24 @@ def predict(
 
     Returns:
         A predictions response"""
-    auth = decodeJWT(authorization)
-    if auth["valid"]:
-        retriever = load_embedding(
-            Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/"
-        )
-        llms = retrieve_model(data, auth["data"]["username"])
-        chain = ConversationalRetrievalChain.from_llm(
-            llm=llms, retriever=retriever.as_retriever(search_type="mmr", search_kwargs={'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX), 'fetch_k': (data.conversation_config['fetch_k'] if data.conversation_config['fetch_k'] else Param.FETCH_INDEX)}),verbose=True
-        )
-        result = LLM(chain, llms, retriever).predict(data.query, data.chat_history,data.conversation_config['bot_context_setting'])
+    try:
+        auth = decodeJWT(authorization)
+        if auth["valid"]:
+            retriever = load_embedding(
+                Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/"
+            )
+            llms = retrieve_model(data, auth["data"]["username"])
+            chain = ConversationalRetrievalChain.from_llm(
+                llm=llms, retriever=retriever.as_retriever(search_type="mmr", search_kwargs={'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX), 'fetch_k': (data.conversation_config['fetch_k'] if data.conversation_config['fetch_k'] else Param.FETCH_INDEX)}),verbose=True
+            )
+            result = LLM(chain, llms, retriever).predict(data.query, data.chat_history,data.conversation_config['bot_context_setting'])
 
-        return APIResponse(status="success", message=result)
-    else:
-        return HTTPException(401, detail="Unauthorised")
+            return APIResponse(status="success", message=result)
+        else:
+            return HTTPException(401, detail="Unauthorised")
+    except Exception as e:
+        print(e)
+        return HTTPException(500, detail="Internal Server Error")
 
 
 @router.post("/feedback")
