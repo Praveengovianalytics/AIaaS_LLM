@@ -15,36 +15,36 @@ jobs:
       with:
             host: 34.173.56.83
             username: praveengovi_nlp
-            key: > 
-                      -----BEGIN OPENSSH PRIVATE KEY-----
-                      b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
-                      NhAAAAAwEAAQAAAQEAyEyZ2SIWcO10iCnXy2LG142Z3vSXhRMecwm3Zbhc9w02DmdbgRJs
-                      uTHhtohp9t7Ib7ExNz6rT2NrpIR25ApgF035gVGGjE/8//1DHqZcU7r/4H28m8anqImRbo
-                      CfsbJ9oWtWZSz3+bhHf3U0VUQIr9hRFjuCA+V/pKtAnIz2Hssv/OYhtDj77NIdqKvxkrXL
-                      SBjeM5qzVBe3Xc6bC6ZxsO0l6UbxkDFB+xjerHvmezinZ4GvuOJSQy0CWLERBQoWOYD5K6
-                      LrI0wxwJkkixS7OUXOKZ6xiOogCYesmb/cMVXpkYx6jprIH1xRHJUeuraoLB40Z0ICtnvA
-                      3OYSVae50QAAA8j41FIb+NRSGwAAAAdzc2gtcnNhAAABAQDITJnZIhZw7XSIKdfLYsbXjZ
-                      ne9JeFEx5zCbdluFz3DTYOZ1uBEmy5MeG2iGn23shvsTE3PqtPY2ukhHbkCmAXTfmBUYaM
-                      T/z//UMeplxTuv/gfbybxqeoiZFugJ+xsn2ha1ZlLPf5uEd/dTRVRAiv2FEWO4ID5X+kq0
-                      CcjPYeyy/85iG0OPvs0h2oq/GStctIGN4zmrNUF7ddzpsLpnGw7SXpRvGQMUH7GN6se+Z7
-                      OKdnga+44lJDLQJYsREFChY5gPkrousjTDHAmSSLFLs5Rc4pnrGI6iAJh6yZv9wxVemRjH
-                      qOmsgfXFEclR66tqgsHjRnQgK2e8Dc5hJVp7nRAAAAAwEAAQAAAQAGNdnPUa9AcRxb3HBE
-                      bhucM1fCAfNwvNcE2hhFnyHCxzYV3D6KEfgtBc7pyfD/JokwbV4JSHgnTf3YbAMDrw6rqk
-                      9CIzT4xMIjbcbW/HGAZxvn6f4fFlm8cAeCVZqd99rNVnanTG2j4ILXANtOiX17dkmNVusB
-                      E+yRPn4SXIyFB9m6PYq9qYH1sq/2B3haQFEfpua87w7N4DLU/d+neHsKD0vL9SKWH7juXp
-                      LmJ1DmYvW8O1kPraFCnYkLOLBj/UmIRZDOsT9T8FazF1vEEiuoKO6KOfURsGWPf8XbuzB7
-                      112Q9+1Q1SrEsobTddhZaujp/O+IPJ79tD6UF/yBGOzBAAAAgEdkc6diNApftekd+Illzl
-                      Ujyf+2N9BZSwaxakEd5yB0LsH7ArtS+PDIeBKA3GvOkvji6fo7zoHB3s7FUhxbBaCJnrC8
-                      1eefBmSF0tlzJw2hPE7xLfNArzl/9R7nO+iec2peChjT+PGRQxDjPMYtUBoktuc/mAQdr2
-                      p20x6LFoy0AAAAgQDjR4tMJ/XcxQCCyYvnJHLpYXwerdXKpoLz9G+WjjD55hqvUdCJixCS
-                      NwtNTOVkjeXeqHdorBHpa/NBaqnomvKpcsZVCEPr3T1xghbkHG96N2Dnfl/5LPXJ4Eqg6K
-                      0ig/gvW9yc8KyCMbJ8PU9K9esj8vlu+ASICZr2+R7G+ZP/QwAAAIEA4ZxAAHuZ2LRV7m9S
-                      o2kjNpDwmsGC7RiKmG1QUm5S4k6PNKuAqyMSsgWgjsMWoHPkaBeYupMGt2yK7jBUTyHRL5
-                      p/CmelzDoBUPInr9/JkloCSw72PfJyalTpuZzInpY0Oirqid4fNI9Dl6U8RsJeX1KchEdo
-                      6kGixM7LQCLzv1sAAAAPcHJhdmVlbmdvdmlfbmxwAQIDBA==
-                      -----END OPENSSH PRIVATE KEY-----
+            key: >
+                    -----BEGIN OPENSSH PRIVATE KEY-----
+                    b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
+                    NhAAAAAwEAAQAAAQEAyEyZ2SIWcO10iCnXy2LG142Z3vSXhRMecwm3Zbhc9w02DmdbgRJs
+                    uTHhtohp9t7Ib7ExNz6rT2NrpIR25ApgF035gVGGjE/8//1DHqZcU7r/4H28m8anqImRbo
+                    CfsbJ9oWtWZSz3+bhHf3U0VUQIr9hRFjuCA+V/pKtAnIz2Hssv/OYhtDj77NIdqKvxkrXL
+                    SBjeM5qzVBe3Xc6bC6ZxsO0l6UbxkDFB+xjerHvmezinZ4GvuOJSQy0CWLERBQoWOYD5K6
+                    LrI0wxwJkkixS7OUXOKZ6xiOogCYesmb/cMVXpkYx6jprIH1xRHJUeuraoLB40Z0ICtnvA
+                    3OYSVae50QAAA8j41FIb+NRSGwAAAAdzc2gtcnNhAAABAQDITJnZIhZw7XSIKdfLYsbXjZ
+                    ne9JeFEx5zCbdluFz3DTYOZ1uBEmy5MeG2iGn23shvsTE3PqtPY2ukhHbkCmAXTfmBUYaM
+                    T/z//UMeplxTuv/gfbybxqeoiZFugJ+xsn2ha1ZlLPf5uEd/dTRVRAiv2FEWO4ID5X+kq0
+                    CcjPYeyy/85iG0OPvs0h2oq/GStctIGN4zmrNUF7ddzpsLpnGw7SXpRvGQMUH7GN6se+Z7
+                    OKdnga+44lJDLQJYsREFChY5gPkrousjTDHAmSSLFLs5Rc4pnrGI6iAJh6yZv9wxVemRjH
+                    qOmsgfXFEclR66tqgsHjRnQgK2e8Dc5hJVp7nRAAAAAwEAAQAAAQAGNdnPUa9AcRxb3HBE
+                    bhucM1fCAfNwvNcE2hhFnyHCxzYV3D6KEfgtBc7pyfD/JokwbV4JSHgnTf3YbAMDrw6rqk
+                    9CIzT4xMIjbcbW/HGAZxvn6f4fFlm8cAeCVZqd99rNVnanTG2j4ILXANtOiX17dkmNVusB
+                    E+yRPn4SXIyFB9m6PYq9qYH1sq/2B3haQFEfpua87w7N4DLU/d+neHsKD0vL9SKWH7juXp
+                    LmJ1DmYvW8O1kPraFCnYkLOLBj/UmIRZDOsT9T8FazF1vEEiuoKO6KOfURsGWPf8XbuzB7
+                    112Q9+1Q1SrEsobTddhZaujp/O+IPJ79tD6UF/yBGOzBAAAAgEdkc6diNApftekd+Illzl
+                    Ujyf+2N9BZSwaxakEd5yB0LsH7ArtS+PDIeBKA3GvOkvji6fo7zoHB3s7FUhxbBaCJnrC8
+                    1eefBmSF0tlzJw2hPE7xLfNArzl/9R7nO+iec2peChjT+PGRQxDjPMYtUBoktuc/mAQdr2
+                    p20x6LFoy0AAAAgQDjR4tMJ/XcxQCCyYvnJHLpYXwerdXKpoLz9G+WjjD55hqvUdCJixCS
+                    NwtNTOVkjeXeqHdorBHpa/NBaqnomvKpcsZVCEPr3T1xghbkHG96N2Dnfl/5LPXJ4Eqg6K
+                    0ig/gvW9yc8KyCMbJ8PU9K9esj8vlu+ASICZr2+R7G+ZP/QwAAAIEA4ZxAAHuZ2LRV7m9S
+                    o2kjNpDwmsGC7RiKmG1QUm5S4k6PNKuAqyMSsgWgjsMWoHPkaBeYupMGt2yK7jBUTyHRL5
+                    p/CmelzDoBUPInr9/JkloCSw72PfJyalTpuZzInpY0Oirqid4fNI9Dl6U8RsJeX1KchEdo
+                    6kGixM7LQCLzv1sAAAAPcHJhdmVlbmdvdmlfbmxwAQIDBA==
+                    -----END OPENSSH PRIVATE KEY-----
             port: 22
-            script:  >
+            script: >
                     cd ~/AIaaS_Projects/AIaas_LLM/AIaaS_LLM/ 
                     git pull
                     cd ~
