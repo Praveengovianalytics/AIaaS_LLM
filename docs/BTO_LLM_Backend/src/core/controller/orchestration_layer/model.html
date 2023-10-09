@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>BTO_LLM_Backend.src.core.controller.orchestration_layer.model API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>BTO_LLM_Backend.src.core.controller.orchestration_layer.model</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from typing import Optional, Type
+
+from langchain import FAISS
+from langchain.chains.conversational_retrieval.base import (
+    BaseConversationalRetrievalChain,
+)
+from langchain.schema.language_model import BaseLanguageModel
+from nemoguardrails.llm.providers import register_llm_provider
+
+from nemoguardrails.llm.taskmanager import LLMTaskManager
+from nemoguardrails.rails.llm.config import Model, RailsConfig
+
+from core.controller.ethic_layer.fact_checking import fact_checking
+from core.controller.ethic_layer.jailbreak import check_jailbreak
+
+from core.controller.ethic_layer.moderation import moderation_check
+
+
+class LLM:
+    def __init__(
+        self,
+        chain: Optional[BaseConversationalRetrievalChain] = None,
+        llm: Optional[Type[BaseLanguageModel]] = None,
+        retriever: FAISS = None,
+    ):
+        &#34;&#34;&#34;
+        The __init__ function is called when the class is instantiated.
+        It sets up the instance of the class, and defines what attributes it has.
+        The __init__ function can take arguments, but does not have to.
+
+        Args:
+            self: Refer to the object itself
+            chain: Optional[BaseConversationalRetrievalChain]: Pass in a chain that will be used to process the input
+            llm: Optional[Type[BaseLanguageModel]]: Pass in the language model class
+            retriever: FAISS: Pass the faiss index to the class
+            : Set the chain of components that will be used to process a query
+
+        Returns:
+            The self object, which is the instance of the class
+        &#34;&#34;&#34;
+        self.chain = chain
+        self.llm = llm
+        self.retriever = retriever
+        register_llm_provider(&#34;custom_llm&#34;, llm)
+        model_config = Model(type=&#34;main&#34;, engine=&#34;customllm&#34;)
+        rails_config = RailsConfig(models=[model_config])
+        self.llm_task_manager = LLMTaskManager(rails_config)
+
+    def pre_check(self, query: str = None):
+        &#34;&#34;&#34;
+        The pre_check function is used to check if the device has been jailbroken.
+            It will return a boolean value of True or False depending on whether it finds any evidence of a jailbreak.
+
+        Args:
+            self: Represent the instance of the class
+            query: str: Pass the query string to the check_jailbreak function
+
+        Returns:
+            A dictionary with the following keys:
+        &#34;&#34;&#34;
+        result = check_jailbreak(query, self.llm)
+        return result
+
+    def post_check(self, inputs: str = None, llm: Optional[BaseLanguageModel] = None):
+        &#34;&#34;&#34;
+        The post_check function takes in a string of text and returns the result of moderation_check and fact checking.
+        Args:
+            self: Represent the instance of the class
+            inputs: str: A string containing the bot&#39;s input.
+            llm: Optional[BaseLanguageModel]: Pass a language model to the post_check function
+
+        Returns:
+            A dictionary with the following keys:
+        &#34;&#34;&#34;
+        check1 = fact_checking(inputs, self.retriever, self.llm)
+        print(check1)
+        result = moderation_check(check1[&#34;content&#34;], llm)
+        return result
+
+    def predict(self, query: str = None, chat_history: list = None):
+        &#34;&#34;&#34;
+        The predict function takes in a query and chat history, and returns an answer.
+        The predict function is the main function of the bot. It takes in a user&#39;s query as well as
+        the chat history between the user and bot, processes it using various functions defined above,
+        and returns an answer to be displayed to the user.
+
+        Args:
+            self: Represent the instance of the class
+            query: str: Pass the user&#39;s query to the bot
+            chat_history: list: Store the chat history of the user
+
+        Returns:
+            A dictionary with the key &amp;quot;answer&amp;quot; and value as the answer
+
+        &#34;&#34;&#34;
+        pre_require = self.pre_check(query)
+        print(pre_require)
+        if pre_require[&#34;check&#34;] == &#34;pass&#34;:
+            result = self.chain(
+                {
+                    &#34;question&#34;: &#34;Your are a data dictionary bot. Your task is to fully answer the &#34;
+                    &#34;user&#39;s query based on the&#34;
+                    &#34;information provided to you. The user&#39;s query will be based on the &#34;
+                    &#34;data provided to you.&#34;
+                    &#34;Your response should &#34;
+                    &#34;be comprehensive, evident and provide all the necessary information &#34;
+                    &#34;using the data given to you to&#34;
+                    &#34;explain and address the user query.You do not respond as &#39;User&#39; or pretend to be &#39;User&#39;. You only respond once as &#39;Assistant&#39;. Please ensure that your answer &#34;
+                    &#34;is clear,&#34;
+                    &#34;concise, and accurate, using the provided data and attributes to provide a &#34;
+                    &#34;complete and informative response. Just mention everything you know &#34;
+                    &#34;about the query from the data provided. &#34;
+                    &#34;\n &#34;
+                    &#34; User query:&#34; + query,
+                    &#34;chat_history&#34;: chat_history,
+                }
+            )
+            print(result)
+        else:
+            return pre_require[&#34;content&#34;]
+
+        postcheck = self.post_check(result[&#34;answer&#34;], self.llm)
+        print(postcheck)
+
+        return postcheck[&#34;content&#34;]</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="BTO_LLM_Backend.src.core.controller.orchestration_layer.model.LLM"><code class="flex name class">
+<span>class <span class="ident">LLM</span></span>
+<span>(</span><span>chain: Optional[langchain.chains.conversational_retrieval.base.BaseConversationalRetrievalChain] = None, llm: Optional[Type[langchain.schema.language_model.BaseLanguageModel]] = None, retriever: langchain.vectorstores.faiss.FAISS = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>The <strong>init</strong> function is called when the class is instantiated.
+It sets up the instance of the class, and defines what attributes it has.
+The <strong>init</strong> function can take arguments, but does not have to.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>self</code></strong></dt>
+<dd>Refer to the object itself</dd>
+<dt><strong><code>chain</code></strong></dt>
+<dd>Optional[BaseConversationalRetrievalChain]: Pass in a chain that will be used to process the input</dd>
+<dt><strong><code>llm</code></strong></dt>
+<dd>Optional[Type[BaseLanguageModel]]: Pass in the language model class</dd>
+<dt><strong><code>retriever</code></strong></dt>
+<dd>FAISS: Pass the faiss index to the class</dd>
+<dd>Set the chain of components that will be used to process a query</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The self object, which is the instance of the class</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LLM:
+    def __init__(
+        self,
+        chain: Optional[BaseConversationalRetrievalChain] = None,
+        llm: Optional[Type[BaseLanguageModel]] = None,
+        retriever: FAISS = None,
+    ):
+        &#34;&#34;&#34;
+        The __init__ function is called when the class is instantiated.
+        It sets up the instance of the class, and defines what attributes it has.
+        The __init__ function can take arguments, but does not have to.
+
+        Args:
+            self: Refer to the object itself
+            chain: Optional[BaseConversationalRetrievalChain]: Pass in a chain that will be used to process the input
+            llm: Optional[Type[BaseLanguageModel]]: Pass in the language model class
+            retriever: FAISS: Pass the faiss index to the class
+            : Set the chain of components that will be used to process a query
+
+        Returns:
+            The self object, which is the instance of the class
+        &#34;&#34;&#34;
+        self.chain = chain
+        self.llm = llm
+        self.retriever = retriever
+        register_llm_provider(&#34;custom_llm&#34;, llm)
+        model_config = Model(type=&#34;main&#34;, engine=&#34;customllm&#34;)
+        rails_config = RailsConfig(models=[model_config])
+        self.llm_task_manager = LLMTaskManager(rails_config)
+
+    def pre_check(self, query: str = None):
+        &#34;&#34;&#34;
+        The pre_check function is used to check if the device has been jailbroken.
+            It will return a boolean value of True or False depending on whether it finds any evidence of a jailbreak.
+
+        Args:
+            self: Represent the instance of the class
+            query: str: Pass the query string to the check_jailbreak function
+
+        Returns:
+            A dictionary with the following keys:
+        &#34;&#34;&#34;
+        result = check_jailbreak(query, self.llm)
+        return result
+
+    def post_check(self, inputs: str = None, llm: Optional[BaseLanguageModel] = None):
+        &#34;&#34;&#34;
+        The post_check function takes in a string of text and returns the result of moderation_check and fact checking.
+        Args:
+            self: Represent the instance of the class
+            inputs: str: A string containing the bot&#39;s input.
+            llm: Optional[BaseLanguageModel]: Pass a language model to the post_check function
+
+        Returns:
+            A dictionary with the following keys:
+        &#34;&#34;&#34;
+        check1 = fact_checking(inputs, self.retriever, self.llm)
+        print(check1)
+        result = moderation_check(check1[&#34;content&#34;], llm)
+        return result
+
+    def predict(self, query: str = None, chat_history: list = None):
+        &#34;&#34;&#34;
+        The predict function takes in a query and chat history, and returns an answer.
+        The predict function is the main function of the bot. It takes in a user&#39;s query as well as
+        the chat history between the user and bot, processes it using various functions defined above,
+        and returns an answer to be displayed to the user.
+
+        Args:
+            self: Represent the instance of the class
+            query: str: Pass the user&#39;s query to the bot
+            chat_history: list: Store the chat history of the user
+
+        Returns:
+            A dictionary with the key &amp;quot;answer&amp;quot; and value as the answer
+
+        &#34;&#34;&#34;
+        pre_require = self.pre_check(query)
+        print(pre_require)
+        if pre_require[&#34;check&#34;] == &#34;pass&#34;:
+            result = self.chain(
+                {
+                    &#34;question&#34;: &#34;Your are a data dictionary bot. Your task is to fully answer the &#34;
+                    &#34;user&#39;s query based on the&#34;
+                    &#34;information provided to you. The user&#39;s query will be based on the &#34;
+                    &#34;data provided to you.&#34;
+                    &#34;Your response should &#34;
+                    &#34;be comprehensive, evident and provide all the necessary information &#34;
+                    &#34;using the data given to you to&#34;
+                    &#34;explain and address the user query.You do not respond as &#39;User&#39; or pretend to be &#39;User&#39;. You only respond once as &#39;Assistant&#39;. Please ensure that your answer &#34;
+                    &#34;is clear,&#34;
+                    &#34;concise, and accurate, using the provided data and attributes to provide a &#34;
+                    &#34;complete and informative response. Just mention everything you know &#34;
+                    &#34;about the query from the data provided. &#34;
+                    &#34;\n &#34;
+                    &#34; User query:&#34; + query,
+                    &#34;chat_history&#34;: chat_history,
+                }
+            )
+            print(result)
+        else:
+            return pre_require[&#34;content&#34;]
+
+        postcheck = self.post_check(result[&#34;answer&#34;], self.llm)
+        print(postcheck)
+
+        return postcheck[&#34;content&#34;]</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="BTO_LLM_Backend.src.core.controller.orchestration_layer.model.LLM.post_check"><code class="name flex">
+<span>def <span class="ident">post_check</span></span>(<span>self, inputs: str = None, llm: Optional[langchain.schema.language_model.BaseLanguageModel] = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>The post_check function takes in a string of text and returns the result of moderation_check and fact checking.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>self</code></strong></dt>
+<dd>Represent the instance of the class</dd>
+<dt><strong><code>inputs</code></strong></dt>
+<dd>str: A string containing the bot's input.</dd>
+<dt><strong><code>llm</code></strong></dt>
+<dd>Optional[BaseLanguageModel]: Pass a language model to the post_check function</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>A dictionary with the following keys:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def post_check(self, inputs: str = None, llm: Optional[BaseLanguageModel] = None):
+    &#34;&#34;&#34;
+    The post_check function takes in a string of text and returns the result of moderation_check and fact checking.
+    Args:
+        self: Represent the instance of the class
+        inputs: str: A string containing the bot&#39;s input.
+        llm: Optional[BaseLanguageModel]: Pass a language model to the post_check function
+
+    Returns:
+        A dictionary with the following keys:
+    &#34;&#34;&#34;
+    check1 = fact_checking(inputs, self.retriever, self.llm)
+    print(check1)
+    result = moderation_check(check1[&#34;content&#34;], llm)
+    return result</code></pre>
+</details>
+</dd>
+<dt id="BTO_LLM_Backend.src.core.controller.orchestration_layer.model.LLM.pre_check"><code class="name flex">
+<span>def <span class="ident">pre_check</span></span>(<span>self, query: str = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>The pre_check function is used to check if the device has been jailbroken.
+It will return a boolean value of True or False depending on whether it finds any evidence of a jailbreak.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>self</code></strong></dt>
+<dd>Represent the instance of the class</dd>
+<dt><strong><code>query</code></strong></dt>
+<dd>str: Pass the query string to the check_jailbreak function</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>A dictionary with the following keys:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pre_check(self, query: str = None):
+    &#34;&#34;&#34;
+    The pre_check function is used to check if the device has been jailbroken.
+        It will return a boolean value of True or False depending on whether it finds any evidence of a jailbreak.
+
+    Args:
+        self: Represent the instance of the class
+        query: str: Pass the query string to the check_jailbreak function
+
+    Returns:
+        A dictionary with the following keys:
+    &#34;&#34;&#34;
+    result = check_jailbreak(query, self.llm)
+    return result</code></pre>
+</details>
+</dd>
+<dt id="BTO_LLM_Backend.src.core.controller.orchestration_layer.model.LLM.predict"><code class="name flex">
+<span>def <span class="ident">predict</span></span>(<span>self, query: str = None, chat_history: list = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>The predict function takes in a query and chat history, and returns an answer.
+The predict function is the main function of the bot. It takes in a user's query as well as
+the chat history between the user and bot, processes it using various functions defined above,
+and returns an answer to be displayed to the user.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>self</code></strong></dt>
+<dd>Represent the instance of the class</dd>
+<dt><strong><code>query</code></strong></dt>
+<dd>str: Pass the user's query to the bot</dd>
+<dt><strong><code>chat_history</code></strong></dt>
+<dd>list: Store the chat history of the user</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>A dictionary with the key &quot;answer&quot; and value as the answer</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def predict(self, query: str = None, chat_history: list = None):
+    &#34;&#34;&#34;
+    The predict function takes in a query and chat history, and returns an answer.
+    The predict function is the main function of the bot. It takes in a user&#39;s query as well as
+    the chat history between the user and bot, processes it using various functions defined above,
+    and returns an answer to be displayed to the user.
+
+    Args:
+        self: Represent the instance of the class
+        query: str: Pass the user&#39;s query to the bot
+        chat_history: list: Store the chat history of the user
+
+    Returns:
+        A dictionary with the key &amp;quot;answer&amp;quot; and value as the answer
+
+    &#34;&#34;&#34;
+    pre_require = self.pre_check(query)
+    print(pre_require)
+    if pre_require[&#34;check&#34;] == &#34;pass&#34;:
+        result = self.chain(
+            {
+                &#34;question&#34;: &#34;Your are a data dictionary bot. Your task is to fully answer the &#34;
+                &#34;user&#39;s query based on the&#34;
+                &#34;information provided to you. The user&#39;s query will be based on the &#34;
+                &#34;data provided to you.&#34;
+                &#34;Your response should &#34;
+                &#34;be comprehensive, evident and provide all the necessary information &#34;
+                &#34;using the data given to you to&#34;
+                &#34;explain and address the user query.You do not respond as &#39;User&#39; or pretend to be &#39;User&#39;. You only respond once as &#39;Assistant&#39;. Please ensure that your answer &#34;
+                &#34;is clear,&#34;
+                &#34;concise, and accurate, using the provided data and attributes to provide a &#34;
+                &#34;complete and informative response. Just mention everything you know &#34;
+                &#34;about the query from the data provided. &#34;
+                &#34;\n &#34;
+                &#34; User query:&#34; + query,
+                &#34;chat_history&#34;: chat_history,
+            }
+        )
+        print(result)
+    else:
+        return pre_require[&#34;content&#34;]
+
+    postcheck = self.post_check(result[&#34;answer&#34;], self.llm)
+    print(postcheck)
+
+    return postcheck[&#34;content&#34;]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="BTO_LLM_Backend.src.core.controller.orchestration_layer" href="index.html">BTO_LLM_Backend.src.core.controller.orchestration_layer</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="BTO_LLM_Backend.src.core.controller.orchestration_layer.model.LLM" href="#BTO_LLM_Backend.src.core.controller.orchestration_layer.model.LLM">LLM</a></code></h4>
+<ul class="">
+<li><code><a title="BTO_LLM_Backend.src.core.controller.orchestration_layer.model.LLM.post_check" href="#BTO_LLM_Backend.src.core.controller.orchestration_layer.model.LLM.post_check">post_check</a></code></li>
+<li><code><a title="BTO_LLM_Backend.src.core.controller.orchestration_layer.model.LLM.pre_check" href="#BTO_LLM_Backend.src.core.controller.orchestration_layer.model.LLM.pre_check">pre_check</a></code></li>
+<li><code><a title="BTO_LLM_Backend.src.core.controller.orchestration_layer.model.LLM.predict" href="#BTO_LLM_Backend.src.core.controller.orchestration_layer.model.LLM.predict">predict</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
