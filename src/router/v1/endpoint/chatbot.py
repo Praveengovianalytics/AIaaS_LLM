@@ -5,6 +5,8 @@ from fastapi import APIRouter, Header, HTTPException, Form
 
 import shutil
 
+from langchain.callbacks import StreamingStdOutCallbackHandler
+from langchain.callbacks.manager import CallbackManager
 from langchain.chains import ConversationalRetrievalChain
 from typing import List
 
@@ -17,32 +19,35 @@ from core.controller.orchestration_layer.embedding_pipeline import (
     EmbeddingPipeline,
     load_embedding,
 )
-from langchain.llms import CTransformers
 from fastapi import UploadFile
 from core.controller.authentication_layer.jwt import decodeJWT
 from core.limiter import limiter
 from starlette.requests import Request
 from starlette.responses import Response
-
+from langchain.llms import LlamaCpp
 from core.schema.prediction_request import ModelRequest
 
 ## Use In-Memory Ram
 user_model_cache = cachetools.LRUCache(maxsize=20)
+callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+n_gpu_layers = 40  # Change this value based on your model and your GPU VRAM pool.
+n_batch = 512
 
-llm = CTransformers(
-    model=Param.LLM_MODEL_PATH,
-    model_type=Param.LLM_MODEL_TYPE,
-    config={
-        "max_new_tokens": Param.LLM_MAX_NEW_TOKENS,
-        "temperature": Param.LLM_TEMPERATURE,
-        "top_k": Param.TOP_K,
-        "top_p": Param.TOP_P,
-        "batch_size": Param.BATCH_SIZE,
-        "context_length":Param.LLM_CONTEXT_LENGTH
+llm = LlamaCpp(
+    model_path=Param.LLM_MODEL_PATH,
+    max_new_tokens=Param.LLM_MAX_NEW_TOKENS,
+    temperature= Param.LLM_TEMPERATURE,
+    top_k= Param.TOP_K,
+    top_p= Param.TOP_P,
+    n_gpu_layers=n_gpu_layers,
+    n_batch=n_batch,
+    batch_size= Param.BATCH_SIZE,
+    context_length= Param.LLM_CONTEXT_LENGTH,
+    callback_manager=callback_manager,
+    n_ctx=4000,
+    verbose=True, # Verbose is required to pass to the callback manager
+    )
 
-    }
-
-)
 router = APIRouter()
 
 
@@ -66,7 +71,6 @@ def get_configuration(request: Request, response: Response):
         "top_k": Param.TOP_K,
         "top_p": Param.TOP_P,
         "batch_size": Param.BATCH_SIZE
-
     }}
 
 
@@ -144,12 +148,23 @@ def set_model(request: Request, response: Response, data: ModelRequest, authoriz
 
                 if exist == '':
                     data.config['context_length']=Param.LLM_CONTEXT_LENGTH
-                    custom_llm = CTransformers(
-                        model=Param.LLM_MODEL_PATH,
-                        model_type=Param.LLM_MODEL_TYPE,
-                        config=data.config
-
+                    custom_llm = LlamaCpp(
+                        model_path=Param.LLM_MODEL_PATH,
+                        max_new_tokens=data.config['max_new_tokens']if data.config['max_new_tokens'] else Param.LLM_MAX_NEW_TOKENS,
+                        temperature=data.config[
+                            'temperature'] if 'temperature' in data.config else Param.LLM_TEMPERATURE,
+                        top_k=data.config['top_k'] if 'top_k' in data.config else Param.TOP_K,
+                        top_p=data.config['top_p'] if 'top_p' in data.config else Param.TOP_P,
+                        n_gpu_layers=n_gpu_layers,
+                        n_batch=n_batch,
+                        batch_size=data.config['batch_size'] if 'batch_size' in data.config else Param.BATCH_SIZE,
+                        context_length=data.config[
+                            'context_length'] if 'context_length' in data.config else Param.LLM_CONTEXT_LENGTH,
+                        callback_manager=callback_manager,
+                        n_ctx=4000,
+                        verbose=True,  # Verbose is required to pass to the callback manager
                     )
+
                     user_model_cache[auth["data"]["username"]] = {'model': custom_llm, 'config': data.config}
                     print('Created New Model in Cache')
 
@@ -221,11 +236,22 @@ def retrieve_model(data, username):
                     return llms
 
             data.config['context_length']=Param.LLM_CONTEXT_LENGTH
-            custom_llm = CTransformers(
-                model=Param.LLM_MODEL_PATH,
-                model_type=Param.LLM_MODEL_TYPE,
-                config=data.config
-
+            custom_llm = LlamaCpp(
+                model_path=Param.LLM_MODEL_PATH,
+                max_new_tokens=data.config['max_new_tokens'] if data.config[
+                    'max_new_tokens'] else Param.LLM_MAX_NEW_TOKENS,
+                temperature=data.config[
+                    'temperature'] if 'temperature' in data.config else Param.LLM_TEMPERATURE,
+                top_k=data.config['top_k'] if 'top_k' in data.config else Param.TOP_K,
+                top_p=data.config['top_p'] if 'top_p' in data.config else Param.TOP_P,
+                n_gpu_layers=n_gpu_layers,
+                n_batch=n_batch,
+                batch_size=data.config['batch_size'] if 'batch_size' in data.config else Param.BATCH_SIZE,
+                context_length=data.config[
+                    'context_length'] if 'context_length' in data.config else Param.LLM_CONTEXT_LENGTH,
+                callback_manager=callback_manager,
+                n_ctx=4000,
+                verbose=True,  # Verbose is required to pass to the callback manager
             )
             user_model_cache[username] = {'model': custom_llm, 'config': data.config}
             print('Created New Model in Cache')
