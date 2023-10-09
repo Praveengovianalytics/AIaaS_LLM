@@ -2,11 +2,12 @@ class Param:
     """Configure Settings for Application"""
 
     APP_PATH = "/Users/P1359690/backend_ai/"
+    USE_GPU= True
     PORT_NUMBER=8000
     RUNNING_ADDRESS="localhost"
     DB_FAISS_PATH = f"{APP_PATH}embeddings/db_faiss"
     CHAT_LOG_PATH = "logs/feedback_log.txt"
-    LLM_MODEL_PATH = f"{APP_PATH}models/llama-2-7b-chat.ggmlv3.q4_K_S.bin"
+    LLM_MODEL_PATH = f"{APP_PATH}models/llama-2-7b-chat.Q4_K_M.gguf"
     LLM_MODEL_TYPE = "llama"
     # Default Model Configuration
     LLM_MAX_NEW_TOKENS = 1200
