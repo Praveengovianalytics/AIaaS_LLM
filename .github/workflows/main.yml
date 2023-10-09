@@ -15,7 +15,7 @@ jobs:
       with:
             host: 34.173.56.83
             username: praveengovi_nlp
-            key: >
+            key: 
                     -----BEGIN OPENSSH PRIVATE KEY-----
                     b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
                     NhAAAAAwEAAQAAAQEAyEyZ2SIWcO10iCnXy2LG142Z3vSXhRMecwm3Zbhc9w02DmdbgRJs
@@ -44,7 +44,7 @@ jobs:
                     6kGixM7LQCLzv1sAAAAPcHJhdmVlbmdvdmlfbmxwAQIDBA==
                     -----END OPENSSH PRIVATE KEY-----
             port: 22
-            script: >
+            script: 
                     cd ~/AIaaS_Projects/AIaas_LLM/AIaaS_LLM/ 
                     git pull
                     cd ~
