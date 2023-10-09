@@ -1,9 +1,9 @@
 class Param:
     """Configure Settings for Application"""
 
-    APP_PATH = "/Users/P1359690/backend_ai/"
-    PORT_NUMBER=8000
-    RUNNING_ADDRESS="localhost"
+    APP_PATH = "/home/praveengovi_nlp/AIaaS_Projects/AIaas_LLM/AIaaS_LLM/"
+    PORT_NUMBER=8888
+    RUNNING_ADDRESS="0.0.0.0"
     DB_FAISS_PATH = f"{APP_PATH}embeddings/db_faiss"
     CHAT_LOG_PATH = "logs/feedback_log.txt"
     LLM_MODEL_PATH = f"{APP_PATH}models/llama-2-7b-chat.ggmlv3.q4_K_S.bin"
