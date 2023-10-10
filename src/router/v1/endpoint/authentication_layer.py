@@ -1,3 +1,5 @@
+import math
+
 from fastapi import APIRouter, HTTPException
 from ray import serve
 
@@ -14,7 +16,7 @@ from starlette.responses import Response
 router = APIRouter()
 
 
-@serve.deployment(ray_actor_options={"num_cpus": Param.NUM_CPU*(1-Param.DISTRIBUTE_RATIO)},
+@serve.deployment(ray_actor_options={"num_cpus": Param.NUM_CPU*(1-Param.DISTRIBUTE_RATIO) if Param.NUM_CPU<1 else math.floor(Param.NUM_CPU*(1-Param.DISTRIBUTE_RATIO))},
                    autoscaling_config={
                        "target_num_ongoing_requests_per_replica": 10,
                        "min_replicas": 1,

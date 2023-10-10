@@ -1,3 +1,4 @@
+import math
 import os
 
 import cachetools
@@ -52,7 +53,7 @@ llm = LlamaCpp(
 router = APIRouter()
 
 
-@serve.deployment( ray_actor_options={"num_cpus": Param.NUM_CPU*Param.DISTRIBUTE_RATIO,"num_gpus":Param.NUM_GPU},
+@serve.deployment( ray_actor_options={"num_cpus": Param.NUM_CPU*Param.DISTRIBUTE_RATIO if Param.NUM_CPU<1 else math.floor(Param.NUM_CPU*Param.DISTRIBUTE_RATIO),"num_gpus":Param.NUM_GPU if Param.NUM_GPU<1 else math.floor(Param.NUM_GPU)},
                    autoscaling_config={
                        "target_num_ongoing_requests_per_replica": 5,
                        "min_replicas": 1,
