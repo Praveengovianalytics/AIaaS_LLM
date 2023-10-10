@@ -2,8 +2,8 @@ class Param:
     """Configure Settings for Application"""
     USE_GPU= True
     APP_PATH = "/home/praveengovi_nlp/AIaaS_Projects/AIaas_LLM/AIaaS_LLM/"
-    NUM_CPU=4
-    NUM_GPU=0
+    NUM_CPU=8
+    NUM_GPU=1
     DISTRIBUTE_RATIO=0.75
     DB_FAISS_PATH = f"{APP_PATH}embeddings/db_faiss"
     CHAT_LOG_PATH = "logs/feedback_log.txt"

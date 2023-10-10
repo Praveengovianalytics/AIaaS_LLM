@@ -15,11 +15,14 @@ from router.v1.api import Deploy
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--port', dest='port', type=int, help='Port Number')
+parser.add_argument('--address', dest='address', type=str, help='Host')
+
 args = parser.parse_args()
 
-port_set = Param.PORT_NUMBER if not args.port else args.port
+port_set = 8000 if not args.port else args.port
+address_set = "0.0.0.0" if not args.address else args.address
 
-deployment = Deploy()
+deployment = Deploy(port=port_set,address=address_set)
 deployment.load_api()
 
 

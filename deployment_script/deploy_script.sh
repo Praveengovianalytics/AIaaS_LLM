@@ -14,7 +14,7 @@ pwd
 python -V
 export PYTHONPATH=${PYTHONPATH}:$PWD
 
-
+serve shutdown
 ray start --head
 
-python main.py --http-port $PORT_NUMBER --http-address $ADDRESS
+python main.py --port $PORT_NUMBER --address $ADDRESS
