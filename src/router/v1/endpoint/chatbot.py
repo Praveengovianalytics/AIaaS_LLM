@@ -413,9 +413,9 @@ def predict(
         A predictions response"""
 
     retriever = load_embedding(
-        Param.EMBEDDING_SAVE_PATH + 'api_key' + "/"
+        Param.EMBEDDING_SAVE_PATH + api_key + "/"
     )
-    llms = retrieve_model(data, 'api_key')
+    llms = retrieve_model(data, api_key)
     chain = ConversationalRetrievalChain.from_llm(
         llm=llms, retriever=retriever.as_retriever(search_type="mmr", search_kwargs={'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX), 'fetch_k': (data.conversation_config['fetch_k'] if data.conversation_config['fetch_k'] else Param.FETCH_INDEX)}),verbose=True
     )
