@@ -1,10 +1,11 @@
 import os
 
 import cachetools
-from fastapi import APIRouter, Header, HTTPException, Form
+from fastapi import APIRouter, Header, HTTPException, Form, Security
 
 import shutil
 
+from fastapi.security import APIKeyHeader
 from langchain.callbacks import StreamingStdOutCallbackHandler
 from langchain.callbacks.manager import CallbackManager
 from langchain.chains import ConversationalRetrievalChain
@@ -336,3 +337,88 @@ def feedback(
         return APIResponse(status="success", message="Feedback Noted")
     else:
         return HTTPException(401, detail="Unauthorised")
+
+
+api_key_header = APIKeyHeader(name="X-API-Key")
+api_keys=['TESTKEY123']
+def get_api_key(api_key_header: str = Security(api_key_header)) -> str:
+    if api_key_header in api_keys:
+        return api_key_header
+    raise HTTPException(
+        status_code=401,
+        detail="Invalid or missing API Key",
+    )
+
+
+
+@router.post("/create_embeddingLB")
+def create_embedding(
+        request: Request,
+        response: Response,
+        file: List[UploadFile] = Form(...), extension: List[str] = Form(...),
+        api_key: str = Security(get_api_key),
+):
+    """
+    The create_embedding function creates a new embedding file.
+
+    Args:
+
+        file: File Received
+        authorization: str: Get the jwt token from the header
+        : Get the embedding model for a particular user
+
+    Returns:
+        A success message if the embedding is created successfully"""
+    print(api_key)
+
+    user_folder = Param.EMBEDDING_MODEL_PATH + api_key + "/"
+    if os.path.exists(user_folder):
+        shutil.rmtree(user_folder)
+    else:
+        os.makedirs(user_folder)
+    file_list=[]
+    for infile in file:
+        file_location = f"{Param.TEMP_SAVE_PATH}/{infile.filename}"
+        with open(file_location, "wb+") as file_object:
+            file_object.write(infile.file.read())
+            file_list.append(file_location)
+
+    embedding = EmbeddingPipeline(file_list, api_key,extension)
+    embedding.save_db_local()
+
+    for address in file_list:
+        if os.path.isfile(address):
+            os.remove(address)
+    return APIResponse(status="success", message="Embedding Created Success")
+
+
+@router.post("/predictLB")
+def predict(
+        request: Request,
+        response: Response,
+        data: PredictionRequest,
+        api_key: str = Security(get_api_key),
+):
+    """
+    The predict function is the main function of this API. It takes in a query and chat history,
+    and returns a response from the model. The predict function also requires an authorization header
+    which contains a JWT token that has been signed by our server.
+
+    Args:
+        data: PredictionRequest: Pass the query and chat history to the predict function
+        authorization: str: Pass the jwt token to the function
+        : Pass the query and chat history to the model
+
+    Returns:
+        A predictions response"""
+
+    retriever = load_embedding(
+        Param.EMBEDDING_SAVE_PATH + 'api_key' + "/"
+    )
+    llms = retrieve_model(data, 'api_key')
+    chain = ConversationalRetrievalChain.from_llm(
+        llm=llms, retriever=retriever.as_retriever(search_type="mmr", search_kwargs={'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX), 'fetch_k': (data.conversation_config['fetch_k'] if data.conversation_config['fetch_k'] else Param.FETCH_INDEX)}),verbose=True
+    )
+    result = LLM(chain, llms, retriever).predict(data.query, data.chat_history,data.conversation_config['bot_context_setting'])
+
+    return APIResponse(status="success", message=result)
