@@ -6,7 +6,7 @@ class Param:
     RUNNING_ADDRESS="0.0.0.0"
     DB_FAISS_PATH = f"{APP_PATH}embeddings/db_faiss"
     CHAT_LOG_PATH = "logs/feedback_log.txt"
-    LLM_MODEL_PATH = f"{APP_PATH}models/llama-2-7b-chat.Q4_K_M.gguf"
+    LLM_MODEL_PATH = f"{APP_PATH}models/llama-2-13b-chat.Q4_K_M.gguf"
     LLM_MODEL_TYPE = "llama"
     # Default Model Configuration
     LLM_MAX_NEW_TOKENS = 1200
