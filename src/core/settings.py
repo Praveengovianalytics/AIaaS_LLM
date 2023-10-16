@@ -11,6 +11,11 @@ class Param:
     # Default Model Configuration
     LLM_MAX_NEW_TOKENS = 1200
     LLM_TEMPERATURE = 0.4
+    LLM_MODEL={
+        'mistral-7b':f"{APP_PATH}models/mistral-7b-openorca.Q4_K_M.gguf",
+        'llama2-7b':f"{APP_PATH}models/llama-2-7b-chat.Q4_K_M.gguf",
+        'llama2-13b':f"{APP_PATH}models/llama-2-13b-chat.Q4_K_M.gguf"
+    }
     BATCH_SIZE = 256
     TOP_K = 40
     TOP_P=0.95
