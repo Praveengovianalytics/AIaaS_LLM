@@ -15,6 +15,7 @@ from core.controller.orchestration_layer.model import LLM
 from core.schema.api_response import APIResponse
 from core.schema.feedback_request import FeedbackRequest
 from core.schema.prediction_request import PredictionRequest
+from core.schema.speech_response import AudioRequest
 from core.settings import Param
 from core.controller.orchestration_layer.embedding_pipeline import (
     EmbeddingPipeline,
@@ -27,6 +28,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 from langchain.llms import LlamaCpp
 from core.schema.prediction_request import ModelRequest
+from speech_recognition import Recognizer, AudioData
 
 ## Use In-Memory Ram
 user_model_cache = cachetools.LRUCache(maxsize=5)
@@ -98,6 +100,7 @@ def get_configuration_chat(request: Request, response: Response):
 
     }}
 
+
 @router.get("/ping")
 @limiter.limit("5/second")
 def health_check(request: Request, response: Response):
@@ -139,10 +142,11 @@ def set_model(request: Request, response: Response, data: ModelRequest, authoriz
                     print('Exist Model in Cache')
 
             if exist == '':
-                data.config['context_length']=Param.LLM_CONTEXT_LENGTH
+                data.config['context_length'] = Param.LLM_CONTEXT_LENGTH
                 custom_llm = LlamaCpp(
                     model_path=Param.LLM_MODEL[data.config['model']],
-                    max_new_tokens=data.config['max_new_tokens']if data.config['max_new_tokens'] else Param.LLM_MAX_NEW_TOKENS,
+                    max_new_tokens=data.config['max_new_tokens'] if data.config[
+                        'max_new_tokens'] else Param.LLM_MAX_NEW_TOKENS,
                     temperature=data.config[
                         'temperature'] if 'temperature' in data.config else Param.LLM_TEMPERATURE,
                     top_k=data.config['top_k'] if 'top_k' in data.config else Param.TOP_K,
@@ -191,14 +195,14 @@ def create_embedding(
             shutil.rmtree(user_folder)
         else:
             os.makedirs(user_folder)
-        file_list=[]
+        file_list = []
         for infile in file:
             file_location = f"{Param.TEMP_SAVE_PATH}/{infile.filename}"
             with open(file_location, "wb+") as file_object:
                 file_object.write(infile.file.read())
                 file_list.append(file_location)
 
-        embedding = EmbeddingPipeline(file_list, auth["data"]["username"],extension)
+        embedding = EmbeddingPipeline(file_list, auth["data"]["username"], extension)
         embedding.save_db_local()
 
         for address in file_list:
@@ -222,7 +226,7 @@ def retrieve_model(data, username):
                 llms = user_model_cache[i]['model']
                 return llms
 
-        data.config['context_length']=Param.LLM_CONTEXT_LENGTH
+        data.config['context_length'] = Param.LLM_CONTEXT_LENGTH
         custom_llm = LlamaCpp(
             model_path=Param.LLM_MODEL[data.config['model']],
             max_new_tokens=data.config['max_new_tokens'] if data.config[
@@ -272,11 +276,38 @@ def predict(
         )
         llms = retrieve_model(data, auth["data"]["username"])
         chain = ConversationalRetrievalChain.from_llm(
-            llm=llms, retriever=retriever.as_retriever(search_type="mmr", search_kwargs={'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX), 'fetch_k': (data.conversation_config['fetch_k'] if data.conversation_config['fetch_k'] else Param.FETCH_INDEX)}),verbose=True
+            llm=llms, retriever=retriever.as_retriever(search_type="mmr", search_kwargs={
+                'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX),
+                'fetch_k': (data.conversation_config['fetch_k'] if data.conversation_config[
+                    'fetch_k'] else Param.FETCH_INDEX)}), verbose=True
         )
-        result = LLM(chain, llms, retriever).predict(data.query, data.chat_history,data.conversation_config['bot_context_setting'])
+        result = LLM(chain, llms, retriever).predict(data.query, data.chat_history,
+                                                     data.conversation_config['bot_context_setting'])
 
         return APIResponse(status="success", message=result)
+    else:
+        return HTTPException(401, detail="Unauthorised")
+
+
+@router.post("/speech-to-text")
+@limiter.limit("5/second")
+def STT(
+        request: Request,
+        response: Response,
+        data: AudioRequest,
+        authorization: str = Header(None),
+):
+    auth = decodeJWT(authorization)
+    if auth["valid"]:
+        r = Recognizer()
+        audio_data = AudioData(data.audio['bytes'], data.audio['sample_rate'], data.audio['sample_width'])
+        try:
+            text = r.recognize_sphinx(audio_data)
+            print(text)
+        except Exception as e:
+            print(e)
+            text='Unable to Recognise Text At the Moment'
+        return APIResponse(status="success", message=text)
     else:
         return HTTPException(401, detail="Unauthorised")
 
@@ -369,7 +400,7 @@ def create_embedding(
             file_object.write(infile.file.read())
             file_list.append(file_location)
 
-    embedding = EmbeddingPipeline(file_list, api_key,extension)
+    embedding = EmbeddingPipeline(file_list, api_key, extension)
     embedding.save_db_local()
 
     for address in file_list:
@@ -403,8 +434,12 @@ def predict(
     )
     llms = retrieve_model(data, api_key)
     chain = ConversationalRetrievalChain.from_llm(
-        llm=llms, retriever=retriever.as_retriever(search_type="mmr", search_kwargs={'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX), 'fetch_k': (data.conversation_config['fetch_k'] if data.conversation_config['fetch_k'] else Param.FETCH_INDEX)}),verbose=True
+        llm=llms, retriever=retriever.as_retriever(search_type="mmr", search_kwargs={
+            'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX), 'fetch_k': (
+                data.conversation_config['fetch_k'] if data.conversation_config['fetch_k'] else Param.FETCH_INDEX)}),
+        verbose=True
     )
-    result = LLM(chain, llms, retriever).predict(data.query, data.chat_history,data.conversation_config['bot_context_setting'])
+    result = LLM(chain, llms, retriever).predict(data.query, data.chat_history,
+                                                 data.conversation_config['bot_context_setting'])
 
     return APIResponse(status="success", message=result)
