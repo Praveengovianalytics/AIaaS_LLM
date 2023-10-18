@@ -6,7 +6,7 @@ class Param:
     RUNNING_ADDRESS="0.0.0.0"
     DB_FAISS_PATH = f"{APP_PATH}embeddings/db_faiss"
     CHAT_LOG_PATH = "logs/feedback_log.txt"
-    LLM_MODEL_PATH = f"{APP_PATH}models/llama-2-7b-chat.Q4_K_M.gguf"
+    LLM_MODEL_PATH = f"{APP_PATH}models/mistral-7b-openorca.Q4_K_M.gguf"
     LLM_MODEL_TYPE = "llama"
     # Default Model Configuration
     LLM_MAX_NEW_TOKENS = 1200
@@ -25,7 +25,7 @@ class Param:
                    "on the information provided to you.")
     EMBEDDING_MODEL_PATH = f"{APP_PATH}models/all-MiniLM-L6-v2"
     EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
-    EMBEDDING_DEVICE = "cpu"
+    EMBEDDING_DEVICE = "cuda"
     CSV_DELIMITER = ","
     CSV_ENCODING = "utf-8"
     TEMP_SAVE_PATH = f"{APP_PATH}/src/static/temp/"
