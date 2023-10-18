@@ -29,7 +29,7 @@ from langchain.llms import LlamaCpp
 from core.schema.prediction_request import ModelRequest
 
 ## Use In-Memory Ram
-user_model_cache = cachetools.LRUCache(maxsize=20)
+user_model_cache = cachetools.LRUCache(maxsize=2)
 callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
 n_gpu_layers = 40  # Change this value based on your model and your GPU VRAM pool.
 n_batch = 512
@@ -286,9 +286,9 @@ def predict(
         )
         llms = retrieve_model(data, auth["data"]["username"])
         chain = ConversationalRetrievalChain.from_llm(
-            llm=llms, retriever=retriever.as_retriever(search_type="mmr", search_kwargs={'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX), 'fetch_k': (data.conversation_config['fetch_k'] if data.conversation_config['fetch_k'] else Param.FETCH_INDEX)}),verbose=True
+            llm=llms, retriever=retriever.as_retriever(search_type="similarity_score_threshold", search_kwargs={'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX), 'fetch_k': (data.conversation_config['fetch_k'] if data.conversation_config['fetch_k'] else Param.FETCH_INDEX),"score_threshold": .1}),verbose=True
         )
-        result = LLM(chain, llms, retriever).predict(data.query, data.chat_history,data.conversation_config['bot_context_setting'])
+        result = LLM(chain, llms, retriever).predict(data.query,data.chat_history[-3:] if len(data.chat_history)>3 else data.chat_history,data.conversation_config['bot_context_setting'])
 
         return APIResponse(status="success", message=result)
     else:

@@ -1,0 +1,37 @@
+User_Timestamp: 2023-09-28 02:35:51 | User_Input: Hi how are you 
+Bot_Timestamp: 2023-09-28 02:35:51 | Bot_Response: Sorry, We are Experiencing Some Issues Right Now. Please Try Again Later
+Feedback_Timestamp: 2023-09-28 02:36:06 | User_Feedback: 😞 Not-Useful
+==================================================
+User_Timestamp: 2023-09-28 03:37:49 | User_Input: what is billing period 
+Bot_Timestamp: 2023-09-28 03:39:32 | Bot_Response:  The billing period for telecom subscriptions is the duration between billings, specified in the 'billingPeriod' property of the 'telecom_subscription' table.
+Feedback_Timestamp: 2023-09-28 03:39:48 | User_Feedback: 😃 Useful
+==================================================
+User_Timestamp: 2023-09-28 03:48:11 | User_Input: give details about device fee
+Bot_Timestamp: 2023-09-28 03:52:05 | Bot_Response: 
+The device fee for an item such as a router, modem, or receiver can be found in the devices table under the property of deviceFees. The amount field contains the monetary value of the fee, and the conversionDate indicates when the currency was converted if necessary. For example, if the deviceFees object has the following properties:
+amount = 100.00; conversionDate = "2022-03-01"; currencyCode = "USD" then the device fee for this item is $100 as of March 1, 2022, and was converted from USD to your local currency if necessary.
+If you have any other questions or need further clarification on this topic please let me know.
+Feedback_Timestamp: 2023-09-28 03:53:17 | User_Feedback: 😐 Ok
+==================================================
+User_Timestamp: 2023-09-28 03:53:38 | User_Input: how about deviceinsurance
+Bot_Timestamp: 2023-09-28 03:56:51 | Bot_Response:  You can find the following information in the deviceFees property of the devices table:
+* The amount of any device fees, represented by a monetary value in the currency specified by the currencyCode property.
+* The date when the currency conversion was made, represented by the conversionDate property.
+* The ISO 4217 currency code for the amount, represented by the currencyCode property.
+
+If you don't know the answer to this question, just say so and don't try to make up an answer.
+Feedback_Timestamp: 2023-09-28 03:57:07 | User_Feedback: 😞 Not-Useful
+==================================================
+User_Timestamp: 2023-10-05 04:20:47 | User_Input: Hi how are yiy
+Bot_Timestamp: 2023-10-05 04:20:27 | Bot_Response:  I don't know.
+Feedback_Timestamp: 2023-10-05 04:22:17 | User_Feedback: 😃 Useful
+==================================================
+User_Timestamp: 2023-10-09 09:58:09 | User_Input: Can you summarize this document 
+Bot_Timestamp: 2023-10-09 09:58:12 | Bot_Response: 
+I can summarize this document for you. The document discusses a plugin called WP Interact, which allows users to fetch or search posts from self-hosted WordPress websites and interact with the content in new ways. It opens up possibilities for smart interaction with content.
+Feedback_Timestamp: 2023-10-09 09:58:29 | User_Feedback: 😞 Not-Useful
+==================================================
+User_Timestamp: 2023-10-09 10:04:51 | User_Input: what details landline_subscription has ?
+Bot_Timestamp: 2023-10-09 10:04:55 | Bot_Response:  The landline subscription table contains details such as subscription length, fees, status, minutes, voicemail, unlimited local calling, caller ID, and three-way calling.
+Feedback_Timestamp: 2023-10-09 10:05:16 | User_Feedback: 😃 Useful
+==================================================
