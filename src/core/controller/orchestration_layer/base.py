@@ -58,7 +58,32 @@ def _get_multi_prompt(
     prompt = ZeroShotAgent.create_prompt(
         tools, prefix=prefix, suffix=suffix_to_use, input_variables=input_variables,
     )
+    prompt.template = """
+    You are working with a pandas dataframe in Python. The name of the dataframe is `df`.
+    You should use the tools below to answer the question posed of you:
 
+    python_repl_ast: A Python shell. Use this to execute python commands. Input should be a valid python command. When using this tool, sometimes output is abbreviated - make sure it does not look abbreviated before using it in your answer.
+
+    Use the following format:
+
+    Question: the input question you must answer
+    Thought: you should always think about what to do
+    Action: the action to take, should be `python_repl_ast`
+    Action Input: the input to the action
+    Observation: the result of the action
+    ...the Thought/Action/Action Input/Observation can repeat N times
+    Thought: I now know the answer to the question
+    Final Answer: the final answer to the original input question
+
+    This is the result of `print(df.head())`:
+    {df_head}
+
+    IMPORTANT: Every <Thought:> must either come with an <Action: and Action Input:> or <Final Answer:>
+
+    Begin!
+    Question: {input}
+    {agent_scratchpad}
+    """
     partial_prompt = prompt.partial()
     if "dfs_head" in input_variables:
         dfs_head = "\n\n".join([d.head(number_of_head_rows).to_markdown() for d in dfs])
@@ -99,6 +124,32 @@ def _get_single_prompt(
     prompt = ZeroShotAgent.create_prompt(
         tools, prefix=prefix, suffix=suffix_to_use, input_variables=input_variables
     )
+    prompt.template="""
+You are working with a pandas dataframe in Python. The name of the dataframe is `df`.
+You should use the tools below to answer the question posed of you:
+
+python_repl_ast: A Python shell. Use this to execute python commands. Input should be a valid python command. When using this tool, sometimes output is abbreviated - make sure it does not look abbreviated before using it in your answer.
+
+Use the following format:
+
+Question: the input question you must answer
+Thought: you should always think about what to do
+Action: the action to take, should be `python_repl_ast`
+Action Input: the input to the action
+Observation: the result of the action
+...the Thought/Action/Action Input/Observation can repeat N times
+Thought: I now know the answer to the question
+Final Answer: the final answer to the original input question
+
+This is the result of `print(df.head())`:
+{df_head}
+
+IMPORTANT: Every <Thought:> must either come with an <Action: and Action Input:> or <Final Answer:>
+
+Begin!
+Question: {input}
+{agent_scratchpad}
+"""
 
     partial_prompt = prompt.partial()
     if "df_head" in input_variables:
@@ -296,32 +347,6 @@ def create_pandas_dataframe_agent(
         )
 
         tools = base_tools + list(extra_tools)
-        prompt.template= """
-You are working with a pandas dataframe in Python. The name of the dataframe is `df`.
-You should use the tools below to answer the question posed of you:
-
-python_repl_ast: A Python shell. Use this to execute python commands. Input should be a valid python command. When using this tool, sometimes output is abbreviated - make sure it does not look abbreviated before using it in your answer.
-
-Use the following format:
-
-Question: the input question you must answer
-Thought: you should always think about what to do
-Action: the action to take, should be `python_repl_ast`
-Action Input: the input to the action
-Observation: the result of the action
-...the Thought/Action/Action Input/Observation can repeat N times
-Thought: I now know the answer to the question
-Final Answer: the final answer to the original input question
-
-This is the result of `print(df.head())`:
-{df_head}
-
-IMPORTANT: Every <Thought:> must either come with an <Action: and Action Input:> or <Final Answer:>
-
-Begin!
-Question: {input}
-{agent_scratchpad}
-"""
         llm_chain = LLMChain(
             llm=llm,
             prompt=prompt,
