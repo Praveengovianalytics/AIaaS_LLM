@@ -212,14 +212,14 @@ def create_embedding(
         user_folder = Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/"
         if os.path.exists(user_folder):
             shutil.rmtree(user_folder)
-        else:
-            os.makedirs(user_folder)
-            os.makedirs(user_folder+'data/')
-            os.makedirs(user_folder+'embedding/')
+
+        os.makedirs(user_folder)
+        os.makedirs(user_folder + 'data/')
+        os.makedirs(user_folder + 'embedding/')
 
         file_list = []
 
-        for index,infile in enumerate(file):
+        for index, infile in enumerate(file):
             file_location = f"{Param.EMBEDDING_SAVE_PATH}/{auth['data']['username']}/data/{infile.filename}.{extension[index]}"
             with open(file_location, "wb+") as file_object:
                 file_object.write(infile.file.read())
@@ -277,7 +277,7 @@ def predict(
     auth = decodeJWT(authorization)
     if auth["valid"]:
         llms = retrieve_model(data, auth["data"]["username"])
-        if data.type=='general':
+        if data.type == 'general':
             retriever = load_embedding(
                 Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/embedding/"
             )
@@ -286,17 +286,18 @@ def predict(
                 llm=llms, retriever=retriever.as_retriever(search_type="similarity_score_threshold", search_kwargs={
                     'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX),
                     'fetch_k': (
-                        data.conversation_config['fetch_k'] if data.conversation_config['fetch_k'] else Param.FETCH_INDEX),
+                        data.conversation_config['fetch_k'] if data.conversation_config[
+                            'fetch_k'] else Param.FETCH_INDEX),
                     "score_threshold": .1}), verbose=True
             )
-            result = LLM(chain, llms, retriever,'general').predict(data.query, data.chat_history[-3:] if len(
+            result = LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
                 data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'])
         else:
-            data=DataPipeline(Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/data/")
-            data=data.process()
+            data = DataPipeline(Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/data/")
+            data = data.process()
             agent = create_pandas_dataframe_agent(llms, data, verbose=True, number_of_head_rows=5,
                                                   prefix="Follow the given template for your response. Do not use the sample table data provided to you, as it's incomplete and can result in incorrect inferences. Use answers in the Observation. You should not making any assumption about the data in Thought. When crafting your response, consistently designate the Action as 'python_repl_ast'. Once you've reached your conclusion, sign off your response with 'Final Answer: <your final answer>'.")
-            result= LLM(agent,llms,None,'data').predict(data.query)
+            result = LLM(agent, llms, None, 'data').predict(data.query)
 
         return APIResponse(status="success", message=result)
     else:
@@ -383,10 +384,9 @@ def create_embedding(
     user_folder = Param.EMBEDDING_SAVE_PATH + api_key + "/"
     if os.path.exists(user_folder):
         shutil.rmtree(user_folder)
-    else:
-        os.makedirs(user_folder)
-        os.makedirs(user_folder + 'data/')
-        os.makedirs(user_folder + 'embedding/')
+    os.makedirs(user_folder)
+    os.makedirs(user_folder + 'data/')
+    os.makedirs(user_folder + 'embedding/')
 
     file_list = []
 
