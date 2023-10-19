@@ -293,9 +293,9 @@ def predict(
             result = LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
                 data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'])
         else:
-            data = DataPipeline(Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/data/")
-            data = data.process()
-            agent = create_pandas_dataframe_agent(llms, data, verbose=True, number_of_head_rows=5,
+            datadf = DataPipeline(Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/data/")
+            datadf = datadf.process()
+            agent = create_pandas_dataframe_agent(llms, datadf, verbose=True, number_of_head_rows=5,
                                                   prefix="Follow the given template for your response. Do not use the sample table data provided to you, as it's incomplete and can result in incorrect inferences. Use answers in the Observation. You should not making any assumption about the data in Thought. When crafting your response, consistently designate the Action as 'python_repl_ast'. Once you've reached your conclusion, sign off your response with 'Final Answer: <your final answer>'.")
             result = LLM(agent, llms, None, 'data').predict(data.query)
 
