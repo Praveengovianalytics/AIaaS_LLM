@@ -6,7 +6,6 @@ from fastapi import APIRouter, Header, HTTPException, Form, Security
 import shutil
 
 from fastapi.security import APIKeyHeader
-from langchain.agents import create_pandas_dataframe_agent
 from langchain.callbacks import StreamingStdOutCallbackHandler
 from langchain.callbacks.manager import CallbackManager
 from langchain.chains import ConversationalRetrievalChain
@@ -30,6 +29,8 @@ from langchain.llms import LlamaCpp
 from core.schema.prediction_request import ModelRequest
 
 from core.controller.orchestration_layer.science_pipeline import DataPipeline
+
+from core.controller.orchestration_layer.base import create_pandas_dataframe_agent
 
 ## Use In-Memory Ram
 
