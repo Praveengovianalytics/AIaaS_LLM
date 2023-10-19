@@ -6,28 +6,33 @@ class Param:
     RUNNING_ADDRESS="0.0.0.0"
     DB_FAISS_PATH = f"{APP_PATH}embeddings/db_faiss"
     CHAT_LOG_PATH = "logs/feedback_log.txt"
-    LLM_MODEL_PATH = f"{APP_PATH}models/mistral-7b-openorca.Q4_K_M.gguf"
     LLM_MODEL_TYPE = "llama"
     # Default Model Configuration
-    LLM_MAX_NEW_TOKENS = 1200
-    LLM_TEMPERATURE = 0.4
-    LLM_MODEL={
-        'mistral-7b':f"{APP_PATH}models/mistral-7b-openorca.Q4_K_M.gguf",
-        'llama2-7b':f"{APP_PATH}models/llama-2-7b-chat.Q4_K_M.gguf",
-        'llama2-13b':f"{APP_PATH}models/llama-2-13b-chat.Q4_K_M.gguf"
+    LLM_MODEL = {
+        'mistral-7b': f"{APP_PATH}models/mistral-7b-openorca.Q4_K_M.gguf",
+        'llama2-7b': f"{APP_PATH}models/llama-2-7b-chat.Q4_K_M.gguf",
+        'llama2-13b': f"{APP_PATH}models/llama-2-13b-chat.Q4_K_M.gguf"
     }
+    DATA_LLM_MODEL = {
+        'WizardCoder-13B': f"{APP_PATH}models/WizardLM-WizardCoder-Python-13B-V1.0.Q5_K_S.gguf",
+        'ZiyaCoder-15B (Coming Soon)': f"{APP_PATH}models/ziya-coding-15b-v1.0.Q4_K_M.gguf",
+        'CodeFuse-34B (Coming Soon)': f"{APP_PATH}models/codefuse-codellama-34b.Q4_K_M.gguf"
+
+    }
+    LLM_MAX_NEW_TOKENS = 4000
+    LLM_TEMPERATURE = 0.4
     BATCH_SIZE = 256
     TOP_K = 40
-    TOP_P=0.95
-    LLM_CONTEXT_LENGTH=4000
+    TOP_P = 0.95
+    LLM_CONTEXT_LENGTH = 4000
     # Ethic Control
-    POST_CONTROL=False
-    JAILBREAK_CONTROL=False
+    POST_CONTROL = False
+    JAILBREAK_CONTROL = False
     # Prompt and Fetching Settings
-    FETCH_INDEX=50
-    SELECT_INDEX=2
-    SYSTEM_PROMPT=("Do note that Your are a data dictionary bot. Your task is to fully answer the user's query based "
-                   "on the information provided to you.")
+    FETCH_INDEX = 20000
+    SELECT_INDEX = 10
+    SYSTEM_PROMPT = ("Do note that Your are a data dictionary bot. Your task is to fully answer the user's query based "
+                     "on the information provided to you.")
     EMBEDDING_MODEL_PATH = f"{APP_PATH}models/all-MiniLM-L6-v2"
     EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
     EMBEDDING_DEVICE = "cuda"

@@ -1,6 +1,6 @@
 from langchain.document_loaders.csv_loader import CSVLoader
 from langchain.document_loaders import PyPDFLoader, JSONLoader, UnstructuredMarkdownLoader, UnstructuredHTMLLoader, \
-    TextLoader, Docx2txtLoader
+    TextLoader, Docx2txtLoader, UnstructuredExcelLoader
 
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
@@ -72,6 +72,8 @@ class EmbeddingPipeline:
                 encoding=Param.CSV_ENCODING,
                 csv_args={"delimiter": Param.CSV_DELIMITER},
             )
+        elif (self.file_extension=='xlsx' or self.file_extension=='xls'):
+            loader=UnstructuredExcelLoader(file_path=self.tmp_file_path)
         elif (self.file_extension == 'pdf'):
             loader = PyPDFLoader(file_path=self.tmp_file_path)
         elif (self.file_extension == 'json'):
@@ -115,7 +117,7 @@ class EmbeddingPipeline:
             The database object
 
         """
-        self.db.save_local(Param.EMBEDDING_SAVE_PATH + self.user + "/", "index")
+        self.db.save_local(Param.EMBEDDING_SAVE_PATH + self.user + "/embedding/", "index")
 
     def get_db(self):
         """
