@@ -15,9 +15,10 @@ from core.settings import Param
 class LLM:
     def __init__(
         self,
-        chain: Optional[BaseConversationalRetrievalChain] = None,
+        chain,
         llm: Optional[Type[BaseLanguageModel]] = None,
         retriever: FAISS = None,
+            type: str = None
     ):
         """
         The __init__ function is called when the class is instantiated.
@@ -37,6 +38,7 @@ class LLM:
         self.chain = chain
         self.llm = llm
         self.retriever = retriever
+        self.type=type
 
 
     def pre_check(self, query: str = None):
@@ -90,18 +92,41 @@ class LLM:
 
 
         if pre_require["check"] == "pass":
-            result = self.chain(
-                {
-                    "question": query+" \n System: "+(str(intial_prompt) if str(intial_prompt) else Param.SYSTEM_PROMPT)+ "You do not respond as 'User' or pretend to be 'User'. You only response once. Please ensure that your answer is clear"
-                    ,
-                    "chat_history": [tuple(sublist) for sublist in chat_history],
-                }
-            )
+            if self.type=='general':
+                result = self.chain(
+                    {
+                        "question": query+" \n System: "+(str(intial_prompt) if str(intial_prompt) else Param.SYSTEM_PROMPT)+ "You do not respond as 'User' or pretend to be 'User'. You only response once. Please ensure that your answer is clear"
+                        ,
+                        "chat_history": [tuple(sublist) for sublist in chat_history],
+                    }
+                )
+            else:
+                result=''
+                for attempt in range(2):
+                    try:
+                        result = self.chain.run(query)
+                        break
+                    except Exception as e:
+                        response = str(e)
+
+                        response = response.removeprefix("Could not parse LLM output: `").removesuffix(
+                            "`"
+                        )
+
+                        result = response  # Feed the response back into the agent
+                        print(result)
+                    # If we've reached the maximum number of retries, give up
+                    if attempt == 1:
+                        result = 'This is a beta feature, your question is not detail enough. Please help me learn by providing the question with more details. Thank you'
             print(result)
         else:
             return pre_require["content"]
+        if self.type=='general':
+            postcheck = self.post_check(result["answer"], self.llm) if Param.POST_CONTROL else {'content':result['answer']}
+            print(postcheck)
 
-        postcheck = self.post_check(result["answer"], self.llm) if Param.POST_CONTROL else {'content':result['answer']}
-        print(postcheck)
+            return postcheck["content"]
+        else:
+            return result
 
-        return postcheck["content"]
+

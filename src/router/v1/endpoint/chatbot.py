@@ -1,3 +1,5 @@
+import datetime
+import logging
 import os
 
 import cachetools
@@ -28,11 +30,17 @@ from starlette.responses import Response
 from langchain.llms import LlamaCpp
 from core.schema.prediction_request import ModelRequest
 
+from core.controller.orchestration_layer.science_pipeline import DataPipeline
+
+from core.controller.orchestration_layer.base import create_pandas_dataframe_agent
+
+from core.controller.authentication_layer.api_jwt import decodeAPIJWT
+
 ## Use In-Memory Ram
 
-user_model_cache = cachetools.LRUCache(maxsize=2)
+user_model_cache = cachetools.LRUCache(maxsize=1)
 callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
-n_gpu_layers = 40  # Change this value based on your model and your GPU VRAM pool.
+n_gpu_layers = 35  # Change this value based on your model and your GPU VRAM pool.
 n_batch = 256
 
 router = APIRouter()
@@ -75,7 +83,8 @@ def get_model(request: Request, response: Response):
     Returns:
         A dictionary with a key of &quot;status&quot; and a value of &quot;healthy&quot;
     """
-    return {"status": "success", "model": list(Param.LLM_MODEL.keys())}
+    return {"status": "success", "general_model": list(Param.LLM_MODEL.keys()),
+            'data_model': list(Param.DATA_LLM_MODEL.keys())}
 
 
 @router.get("/get_configure_chat")
@@ -99,6 +108,7 @@ def get_configuration_chat(request: Request, response: Response):
 
     }}
 
+
 @router.get("/ping")
 @limiter.limit("5/second")
 def health_check(request: Request, response: Response):
@@ -113,7 +123,41 @@ def health_check(request: Request, response: Response):
     Returns:
         A dictionary with a key of &quot;status&quot; and a value of &quot;healthy&quot;
     """
+    print(request.url)
+
     return {"status": "healthy"}
+
+
+def build_model(data):
+    if data.type == 'general':
+        custom_llm = LlamaCpp(
+            model_path=Param.LLM_MODEL[data.config['model']],
+            max_new_tokens=data.config['max_new_tokens'] if data.config['max_new_tokens'] else Param.LLM_MAX_NEW_TOKENS,
+            temperature=data.config[
+                'temperature'] if 'temperature' in data.config else Param.LLM_TEMPERATURE,
+            top_k=data.config['top_k'] if 'top_k' in data.config else Param.TOP_K,
+            top_p=data.config['top_p'] if 'top_p' in data.config else Param.TOP_P,
+            n_gpu_layers=n_gpu_layers,
+            n_batch=n_batch,
+            batch_size=data.config['batch_size'] if 'batch_size' in data.config else Param.BATCH_SIZE,
+            context_length=data.config[
+                'context_length'] if 'context_length' in data.config else Param.LLM_CONTEXT_LENGTH,
+            callback_manager=callback_manager,
+            n_ctx=4000,
+            verbose=True,  # Verbose is required to pass to the callback manager
+        )
+    else:
+        custom_llm = LlamaCpp(
+            model_path=Param.DATA_LLM_MODEL[data.config['model']],
+            temperature=0,
+            n_gpu_layers=n_gpu_layers,
+            n_batch=n_batch,
+            max_tokens=8000,
+            callback_manager=callback_manager,
+            n_ctx=4000,
+            verbose=True,  # Verbose is required to pass to the callback manager
+        )
+    return custom_llm
 
 
 @router.post("/set_model")
@@ -130,7 +174,8 @@ def set_model(request: Request, response: Response, data: ModelRequest, authoriz
     Returns:
         A dictionary with a key of &quot;status&quot; and a value of &quot;healthy&quot;
     """
-    auth = decodeJWT(authorization)
+    auth = decodeJWT(authorization,request.url)
+
     if auth["valid"]:
         try:
             exist = ''
@@ -140,23 +185,8 @@ def set_model(request: Request, response: Response, data: ModelRequest, authoriz
                     print('Exist Model in Cache')
 
             if exist == '':
-                data.config['context_length']=Param.LLM_CONTEXT_LENGTH
-                custom_llm = LlamaCpp(
-                    model_path=Param.LLM_MODEL[data.config['model']],
-                    max_new_tokens=data.config['max_new_tokens']if data.config['max_new_tokens'] else Param.LLM_MAX_NEW_TOKENS,
-                    temperature=data.config[
-                        'temperature'] if 'temperature' in data.config else Param.LLM_TEMPERATURE,
-                    top_k=data.config['top_k'] if 'top_k' in data.config else Param.TOP_K,
-                    top_p=data.config['top_p'] if 'top_p' in data.config else Param.TOP_P,
-                    n_gpu_layers=n_gpu_layers,
-                    n_batch=n_batch,
-                    batch_size=data.config['batch_size'] if 'batch_size' in data.config else Param.BATCH_SIZE,
-                    context_length=data.config[
-                        'context_length'] if 'context_length' in data.config else Param.LLM_CONTEXT_LENGTH,
-                    callback_manager=callback_manager,
-                    n_ctx=4000,
-                    verbose=True,  # Verbose is required to pass to the callback manager
-                )
+                data.config['context_length'] = Param.LLM_CONTEXT_LENGTH
+                custom_llm = build_model(data)
 
                 user_model_cache[auth["data"]["username"]] = {'model': custom_llm, 'config': data.config}
                 print('Created New Model in Cache')
@@ -171,7 +201,7 @@ def set_model(request: Request, response: Response, data: ModelRequest, authoriz
 def create_embedding(
         request: Request,
         response: Response,
-        file: List[UploadFile] = Form(...), extension: List[str] = Form(...),
+        file: List[UploadFile] = Form(...), extension: List[str] = Form(...), type: str = Form(...),
         authorization: str = Header(None),
 ):
     """
@@ -185,26 +215,28 @@ def create_embedding(
 
     Returns:
         A success message if the embedding is created successfully"""
-    auth = decodeJWT(authorization)
+    auth = decodeJWT(authorization,request.url)
+
     if auth["valid"]:
-        user_folder = Param.EMBEDDING_MODEL_PATH + auth["data"]["username"] + "/"
+        user_folder = Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/"
         if os.path.exists(user_folder):
             shutil.rmtree(user_folder)
-        else:
-            os.makedirs(user_folder)
-        file_list=[]
-        for infile in file:
-            file_location = f"{Param.TEMP_SAVE_PATH}/{infile.filename}"
+
+        os.makedirs(user_folder)
+        os.makedirs(user_folder + 'data/')
+        os.makedirs(user_folder + 'embedding/')
+
+        file_list = []
+
+        for index, infile in enumerate(file):
+            file_location = f"{Param.EMBEDDING_SAVE_PATH}/{auth['data']['username']}/data/{infile.filename}.{extension[index]}"
             with open(file_location, "wb+") as file_object:
                 file_object.write(infile.file.read())
                 file_list.append(file_location)
 
-        embedding = EmbeddingPipeline(file_list, auth["data"]["username"],extension)
+        embedding = EmbeddingPipeline(file_list, auth["data"]["username"], extension)
         embedding.save_db_local()
 
-        for address in file_list:
-            if os.path.isfile(address):
-                os.remove(address)
         return APIResponse(status="success", message="Embedding Created Success")
     else:
         return HTTPException(401, detail="Unauthorised")
@@ -223,24 +255,9 @@ def retrieve_model(data, username):
                 llms = user_model_cache[i]['model']
                 return llms
 
-        data.config['context_length']=Param.LLM_CONTEXT_LENGTH
-        custom_llm = LlamaCpp(
-            model_path=Param.LLM_MODEL[data.config['model']],
-            max_new_tokens=data.config['max_new_tokens'] if data.config[
-                'max_new_tokens'] else Param.LLM_MAX_NEW_TOKENS,
-            temperature=data.config[
-                'temperature'] if 'temperature' in data.config else Param.LLM_TEMPERATURE,
-            top_k=data.config['top_k'] if 'top_k' in data.config else Param.TOP_K,
-            top_p=data.config['top_p'] if 'top_p' in data.config else Param.TOP_P,
-            n_gpu_layers=n_gpu_layers,
-            n_batch=n_batch,
-            batch_size=data.config['batch_size'] if 'batch_size' in data.config else Param.BATCH_SIZE,
-            context_length=data.config[
-                'context_length'] if 'context_length' in data.config else Param.LLM_CONTEXT_LENGTH,
-            callback_manager=callback_manager,
-            n_ctx=4000,
-            verbose=True,  # Verbose is required to pass to the callback manager
-        )
+        data.config['context_length'] = Param.LLM_CONTEXT_LENGTH
+
+        custom_llm = build_model(data)
         user_model_cache[username] = {'model': custom_llm, 'config': data.config}
         print('Created New Model in Cache')
         return user_model_cache[username]['model']
@@ -266,16 +283,40 @@ def predict(
 
     Returns:
         A predictions response"""
-    auth = decodeJWT(authorization)
+    auth = decodeJWT(authorization,request.url)
+
     if auth["valid"]:
-        retriever = load_embedding(
-            Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/"
-        )
         llms = retrieve_model(data, auth["data"]["username"])
-        chain = ConversationalRetrievalChain.from_llm(
-            llm=llms, retriever=retriever.as_retriever(search_type="similarity_score_threshold", search_kwargs={'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX), 'fetch_k': (data.conversation_config['fetch_k'] if data.conversation_config['fetch_k'] else Param.FETCH_INDEX),"score_threshold": .1}),verbose=True
-        )
-        result = LLM(chain, llms, retriever).predict(data.query,data.chat_history[-3:] if len(data.chat_history)>3 else data.chat_history,data.conversation_config['bot_context_setting'])
+        if data.type == 'general':
+            retriever = load_embedding(
+                Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/embedding/"
+            )
+
+            chain = ConversationalRetrievalChain.from_llm(
+                llm=llms, retriever=retriever.as_retriever(search_type="similarity_score_threshold", search_kwargs={
+                    'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX),
+                    'fetch_k': (
+                        data.conversation_config['fetch_k'] if data.conversation_config[
+                            'fetch_k'] else Param.FETCH_INDEX),
+                    "score_threshold": .1}), verbose=True
+            )
+            result = LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
+                data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'])
+        else:
+            datadf = DataPipeline(Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/data/")
+            datadf = datadf.process()
+            agent = create_pandas_dataframe_agent(llms, datadf, verbose=True, number_of_head_rows=5,
+                                                  handle_parsing_errors=True,
+                                                  prefix="Follow the given template for your response. Do not use the "
+                                                         "sample table data provided to you, as it's incomplete and "
+                                                         "can result in incorrect inferences. Use answers in the "
+                                                         "Observation. You should not making any assumption about the "
+                                                         "data in Thought. When crafting your response, consistently "
+                                                         "designate the Action as 'python_repl_ast'. Once you've "
+                                                         "reached your conclusion, sign off your response with 'Final "
+                                                         "Answer: <your final answer>'.")
+
+            result = LLM(agent, llms, None, 'data').predict(data.query)
 
         return APIResponse(status="success", message=result)
     else:
@@ -303,7 +344,8 @@ def feedback(
 
     Returns:
         A json object with the status and message"""
-    auth = decodeJWT(authorization)
+    auth = decodeJWT(authorization,request.url)
+
     if auth["valid"]:
         with open(
                 Param.FEEDBACK_LOG_FILE + "feedback_" + auth["data"]["username"] + ".txt",
@@ -327,9 +369,12 @@ def feedback(
 
 
 api_key_header = APIKeyHeader(name="X-API-Key")
-api_keys=['TESTKEY123']
-def get_api_key(api_key_header: str = Security(api_key_header)) -> str:
-    if api_key_header in api_keys:
+
+
+def get_api_key(api_key_header: str = Security(api_key_header),request: Request='') -> str:
+    datas=decodeAPIJWT(api_key_header)
+    if datas['valid']:
+        logging.info(f'{datetime.datetime.now()} - {request.url}:{datas.data}')
         return api_key_header
     raise HTTPException(
         status_code=401,
@@ -337,12 +382,11 @@ def get_api_key(api_key_header: str = Security(api_key_header)) -> str:
     )
 
 
-
 @router.post("/create_embeddingLB")
 def create_embedding(
         request: Request,
         response: Response,
-        file: List[UploadFile] = Form(...), extension: List[str] = Form(...),
+        file: List[UploadFile] = Form(...), extension: List[str] = Form(...), type: str = Form(...),
         api_key: str = Security(get_api_key),
 ):
     """
@@ -358,24 +402,25 @@ def create_embedding(
         A success message if the embedding is created successfully"""
     print(api_key)
 
-    user_folder = Param.EMBEDDING_MODEL_PATH + api_key + "/"
+    user_folder = Param.EMBEDDING_SAVE_PATH + api_key + "/"
     if os.path.exists(user_folder):
         shutil.rmtree(user_folder)
-    else:
-        os.makedirs(user_folder)
-    file_list=[]
-    for infile in file:
-        file_location = f"{Param.TEMP_SAVE_PATH}/{infile.filename}"
+
+    os.makedirs(user_folder)
+    os.makedirs(user_folder + 'data/')
+    os.makedirs(user_folder + 'embedding/')
+
+    file_list = []
+
+    for index, infile in enumerate(file):
+        file_location = f"{Param.EMBEDDING_SAVE_PATH}/{api_key}/data/{infile.filename}.{extension[index]}"
         with open(file_location, "wb+") as file_object:
             file_object.write(infile.file.read())
             file_list.append(file_location)
 
-    embedding = EmbeddingPipeline(file_list, api_key,extension)
+    embedding = EmbeddingPipeline(file_list, api_key, extension)
     embedding.save_db_local()
 
-    for address in file_list:
-        if os.path.isfile(address):
-            os.remove(address)
     return APIResponse(status="success", message="Embedding Created Success")
 
 
@@ -399,13 +444,36 @@ def predict(
     Returns:
         A predictions response"""
 
-    retriever = load_embedding(
-        Param.EMBEDDING_SAVE_PATH + api_key + "/"
-    )
     llms = retrieve_model(data, api_key)
-    chain = ConversationalRetrievalChain.from_llm(
-        llm=llms, retriever=retriever.as_retriever(search_type="mmr", search_kwargs={'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX), 'fetch_k': (data.conversation_config['fetch_k'] if data.conversation_config['fetch_k'] else Param.FETCH_INDEX)}),verbose=True
-    )
-    result = LLM(chain, llms, retriever).predict(data.query, data.chat_history,data.conversation_config['bot_context_setting'])
+    if data.type == 'general':
+        retriever = load_embedding(
+            Param.EMBEDDING_SAVE_PATH + api_key + "/embedding/"
+        )
+
+        chain = ConversationalRetrievalChain.from_llm(
+            llm=llms, retriever=retriever.as_retriever(search_type="similarity_score_threshold", search_kwargs={
+                'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX),
+                'fetch_k': (
+                    data.conversation_config['fetch_k'] if data.conversation_config[
+                        'fetch_k'] else Param.FETCH_INDEX),
+                "score_threshold": .1}), verbose=True
+        )
+        result = LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
+            data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'])
+    else:
+        datadf = DataPipeline(Param.EMBEDDING_SAVE_PATH + api_key + "/data/")
+        datadf = datadf.process()
+        agent = create_pandas_dataframe_agent(llms, datadf, verbose=True, number_of_head_rows=5,
+                                              handle_parsing_errors=True,
+                                              prefix="Follow the given template for your response. Do not use the "
+                                                     "sample table data provided to you, as it's incomplete and "
+                                                     "can result in incorrect inferences. Use answers in the "
+                                                     "Observation. You should not making any assumption about the "
+                                                     "data in Thought. When crafting your response, consistently "
+                                                     "designate the Action as 'python_repl_ast'. Once you've "
+                                                     "reached your conclusion, sign off your response with 'Final "
+                                                     "Answer: <your final answer>'.")
+
+        result = LLM(agent, llms, None, 'data').predict(data.query)
 
     return APIResponse(status="success", message=result)
