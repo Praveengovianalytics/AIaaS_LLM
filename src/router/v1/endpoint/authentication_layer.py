@@ -10,6 +10,12 @@ from core.limiter import limiter
 from starlette.requests import Request
 from starlette.responses import Response
 
+from core.controller.authentication_layer.api_jwt import signAPIJWT
+from core.controller.authentication_layer.jwt import decodeJWT
+from core.schema.login_transaction import APIKeyNewResponse
+
+from core.schema.login_transaction import APIKEYRequest
+from fastapi import Header
 router = APIRouter()
 
 
@@ -74,6 +80,20 @@ def register_user(request: Request, response: Response, data: Login):
             f.write(f"{user}:{hashed_pw}\n")
             return LoginResponse(status="success", username=user)
     return LoginResponse(status="fail")
+
+
+@router.post("/register_api_key")
+@limiter.limit("5/second")
+def register_api(request: Request, response: Response, data: APIKEYRequest, authorization: str = Header(None),
+                 ):
+    auth = decodeJWT(authorization)
+    if auth["valid"]:
+        try:
+            token = signAPIJWT(username=data.username,email=data.email,project=data.project,department=data.department,minutes=data.minutes)
+            return APIKeyNewResponse(status='success', api=token)
+
+        except Exception as e:
+            return APIKeyNewResponse(status="fail", token='')
 
 
 def hash_password(password: str) -> str:
