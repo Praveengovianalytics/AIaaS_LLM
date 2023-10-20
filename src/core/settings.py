@@ -50,3 +50,5 @@ class Param:
     JWT_API_ALGORITHM = "HS256"
     FEEDBACK_LOG_FILE = f"{APP_PATH}/src/static/logs/"
     AUTH_HASH_PASS_FILE = f"{APP_PATH}/src/core/secret/hashed_passwords.txt"
+    CUSTOMER_INFO = f"{APP_PATH}/src/core/secret/customer_data.txt"
+

@@ -39,4 +39,4 @@ class APIKEYRequest(BaseModel):
     email: str
     department: str
     project: str
-    minutes: int
+    day: int

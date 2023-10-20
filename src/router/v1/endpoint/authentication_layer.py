@@ -16,6 +16,7 @@ from core.schema.login_transaction import APIKeyNewResponse
 
 from core.schema.login_transaction import APIKEYRequest
 from fastapi import Header
+
 router = APIRouter()
 
 
@@ -89,7 +90,10 @@ def register_api(request: Request, response: Response, data: APIKEYRequest, auth
     auth = decodeJWT(authorization)
     if auth["valid"]:
         try:
-            token = signAPIJWT(username=data.username,email=data.email,project=data.project,department=data.department,minutes=data.minutes)
+            token = signAPIJWT(username=data.username, email=data.email, project=data.project,
+                               department=data.department, day=data.day)
+            with open(Param.CUSTOMER_INFO, "a") as f:
+                f.write(f"{data.username},{data.email},{data.project},{data.department},{data.day}\n")
             return APIKeyNewResponse(status='success', api=token)
 
         except Exception as e:

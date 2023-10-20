@@ -5,7 +5,7 @@ import jwt
 from core.settings import Param
 
 
-def signAPIJWT(username: str,project:str,department:str,email:str,minutes:str) -> Dict[str, str]:
+def signAPIJWT(username: str, project: str, department: str, email: str, day: int) -> Dict[str, str]:
     """
     The signJWT function takes a username as an argument and returns a JWT token.
     The token is signed with the secret key defined in Param.py, and expires after 180 minutes.
@@ -15,21 +15,21 @@ def signAPIJWT(username: str,project:str,department:str,email:str,minutes:str) -
     Returns:
         :return: A token in the form of a dictionary
     """
-    if minutes:
+    if day:
         payload = {
             "username": username,
-            'project':project,
-            "department":department,
-            "email":email,
+            'project': project,
+            "department": department,
+            "email": email,
             "exp": datetime.datetime.now(tz=datetime.timezone.utc)
-            + datetime.timedelta(minutes=minutes),
+                   + datetime.timedelta(minutes=day * 24 * 60),
         }
     else:
         payload = {
             "username": username,
-            'project':project,
-            "department":department,
-            "email":email
+            'project': project,
+            "department": department,
+            "email": email
         }
     token = jwt.encode(payload, Param.JWT_API_SECRET_KEY, algorithm=Param.JWT_API_ALGORITHM)
 
