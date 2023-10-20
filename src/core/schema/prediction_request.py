@@ -5,6 +5,7 @@ class ModelRequest(BaseModel):
     Model Request Model
     """
     config: dict
+    type: str
 
 class PredictionRequest(BaseModel):
     """
@@ -12,6 +13,7 @@ class PredictionRequest(BaseModel):
     """
 
     query: str
+    type:str
     chat_history: list
     use_default:int
     config:dict
