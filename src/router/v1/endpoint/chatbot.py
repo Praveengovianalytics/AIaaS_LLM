@@ -1,3 +1,5 @@
+import datetime
+import logging
 import os
 
 import cachetools
@@ -121,6 +123,8 @@ def health_check(request: Request, response: Response):
     Returns:
         A dictionary with a key of &quot;status&quot; and a value of &quot;healthy&quot;
     """
+    print(request.url)
+
     return {"status": "healthy"}
 
 
@@ -170,7 +174,8 @@ def set_model(request: Request, response: Response, data: ModelRequest, authoriz
     Returns:
         A dictionary with a key of &quot;status&quot; and a value of &quot;healthy&quot;
     """
-    auth = decodeJWT(authorization)
+    auth = decodeJWT(authorization,request.url)
+
     if auth["valid"]:
         try:
             exist = ''
@@ -210,7 +215,8 @@ def create_embedding(
 
     Returns:
         A success message if the embedding is created successfully"""
-    auth = decodeJWT(authorization)
+    auth = decodeJWT(authorization,request.url)
+
     if auth["valid"]:
         user_folder = Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/"
         if os.path.exists(user_folder):
@@ -277,7 +283,8 @@ def predict(
 
     Returns:
         A predictions response"""
-    auth = decodeJWT(authorization)
+    auth = decodeJWT(authorization,request.url)
+
     if auth["valid"]:
         llms = retrieve_model(data, auth["data"]["username"])
         if data.type == 'general':
@@ -337,7 +344,8 @@ def feedback(
 
     Returns:
         A json object with the status and message"""
-    auth = decodeJWT(authorization)
+    auth = decodeJWT(authorization,request.url)
+
     if auth["valid"]:
         with open(
                 Param.FEEDBACK_LOG_FILE + "feedback_" + auth["data"]["username"] + ".txt",
@@ -363,8 +371,10 @@ def feedback(
 api_key_header = APIKeyHeader(name="X-API-Key")
 
 
-def get_api_key(api_key_header: str = Security(api_key_header)) -> str:
-    if decodeAPIJWT(api_key_header)['valid']:
+def get_api_key(api_key_header: str = Security(api_key_header),request: Request='') -> str:
+    datas=decodeAPIJWT(api_key_header)
+    if datas['valid']:
+        logging.info(f'{datetime.datetime.now()} - {request.url}:{datas.data}')
         return api_key_header
     raise HTTPException(
         status_code=401,

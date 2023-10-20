@@ -1,3 +1,5 @@
+import datetime
+
 from fastapi import APIRouter, HTTPException
 
 from core.schema.login_transaction import Login, LoginResponse
@@ -39,18 +41,18 @@ def login_user(request: Request, response: Response, data: Login):
         for line in lines:
             stored_username, stored_hash = line.strip().split(":")
             if stored_username == data.username:
-                return validate_password(data.username, stored_hash, data.password)
+                return validate_password(data.username, stored_hash, data.password,request.url)
     return LoginResponse(status="fail")
 
 
-def validate_password(username: str, stored_hash: str, provided_password: str) -> dict:
+def validate_password(username: str, stored_hash: str, provided_password: str,request_url) -> dict:
     """Check if a provided password matches the stored hash."""
     result = bcrypt.checkpw(
         provided_password.encode("utf-8"), stored_hash.encode("utf-8")
     )
     if result:
         return LoginResponse(
-            status="success", username=username, token=signJWT(username)
+            status="success", username=username, token=signJWT(username,request_url)
         )
 
     else:
@@ -87,13 +89,13 @@ def register_user(request: Request, response: Response, data: Login):
 @limiter.limit("5/second")
 def register_api(request: Request, response: Response, data: APIKEYRequest, authorization: str = Header(None),
                  ):
-    auth = decodeJWT(authorization)
+    auth = decodeJWT(authorization,request.url)
     if auth["valid"]:
         try:
             token = signAPIJWT(username=data.username, email=data.email, project=data.project,
                                department=data.department, day=data.day)
             with open(Param.CUSTOMER_INFO, "a") as f:
-                f.write(f"{data.username},{data.email},{data.project},{data.department},{data.day}\n")
+                f.write(f"{datetime.datetime.now()} - {data.username},{data.email},{data.project},{data.department},{data.day}\n")
             return APIKeyNewResponse(status='success', api=token)
 
         except Exception as e:
