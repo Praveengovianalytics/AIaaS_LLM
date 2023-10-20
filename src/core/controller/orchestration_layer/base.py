@@ -68,7 +68,7 @@ def _get_multi_prompt(
 
     Question: the input question you must answer
     Thought: you should always think about what to do
-    Action: the action to take, should be `python_repl_ast`
+    Action: python_repl_ast
     Action Input: the input to the action
     Observation: the result of the action
     ...the Thought/Action/Action Input/Observation can repeat N times
@@ -78,7 +78,8 @@ def _get_multi_prompt(
     This is the result of `print(df.head())`:
     {df_head}
 
-    IMPORTANT: Every <Thought:> must either come with an <Action: and Action Input:> or <Final Answer:>
+    *IMPORTANT: Every <Thought:> must either come with an <Action: and Action Input:> or <Final Answer:>
+    Before Ending the Conversation, you must return a final answer.
 
     Begin!
     Question: {input}
@@ -134,7 +135,7 @@ Use the following format:
 
 Question: the input question you must answer
 Thought: you should always think about what to do
-Action: the action to take, should be `python_repl_ast`
+Action: python_repl_ast
 Action Input: the input to the action
 Observation: the result of the action
 ...the Thought/Action/Action Input/Observation can repeat N times
@@ -145,6 +146,7 @@ This is the result of `print(df.head())`:
 {df_head}
 
 IMPORTANT: Every <Thought:> must either come with an <Action: and Action Input:> or <Final Answer:>
+Before Ending the Conversation, you must return a final answer.
 
 Begin!
 Question: {input}

@@ -34,9 +34,9 @@ from core.controller.orchestration_layer.base import create_pandas_dataframe_age
 
 ## Use In-Memory Ram
 
-user_model_cache = cachetools.LRUCache(maxsize=2)
+user_model_cache = cachetools.LRUCache(maxsize=1)
 callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
-n_gpu_layers = 40  # Change this value based on your model and your GPU VRAM pool.
+n_gpu_layers = 30  # Change this value based on your model and your GPU VRAM pool.
 n_batch = 256
 
 router = APIRouter()
@@ -296,8 +296,16 @@ def predict(
         else:
             datadf = DataPipeline(Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/data/")
             datadf = datadf.process()
-            agent = create_pandas_dataframe_agent(llms, datadf, verbose=True, number_of_head_rows=5,
-                                                  prefix="Follow the given template for your response. Do not use the sample table data provided to you, as it's incomplete and can result in incorrect inferences. Use answers in the Observation. You should not making any assumption about the data in Thought. When crafting your response, consistently designate the Action as 'python_repl_ast'. Once you've reached your conclusion, sign off your response with 'Final Answer: <your final answer>'.")
+            agent = create_pandas_dataframe_agent(llms, datadf, verbose=True, number_of_head_rows=5,handle_parsing_errors=True,
+                                                  prefix="Follow the given template for your response. Do not use the "
+                                                         "sample table data provided to you, as it's incomplete and "
+                                                         "can result in incorrect inferences. Use answers in the "
+                                                         "Observation. You should not making any assumption about the "
+                                                         "data in Thought. When crafting your response, consistently "
+                                                         "designate the Action as 'python_repl_ast'. Once you've "
+                                                         "reached your conclusion, sign off your response with 'Final "
+                                                         "Answer: <your final answer>'.")
+
             result = LLM(agent, llms, None, 'data').predict(data.query)
 
         return APIResponse(status="success", message=result)

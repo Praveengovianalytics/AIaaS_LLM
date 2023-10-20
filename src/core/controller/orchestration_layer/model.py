@@ -101,10 +101,23 @@ class LLM:
                     }
                 )
             else:
-                try:
-                    result= self.chain.run(query)
-                except Exception as e:
-                    result='This is a beta feature, your question is not detail enough. Please help me learn by providing the question with more details. Thank you'
+                result=''
+                for attempt in range(2):
+                    try:
+                        result = self.chain.run(query)
+                        break
+                    except Exception as e:
+                        response = str(e)
+
+                        response = response.removeprefix("Could not parse LLM output: `").removesuffix(
+                            "`"
+                        )
+
+                        result = response  # Feed the response back into the agent
+                        print(result)
+                    # If we've reached the maximum number of retries, give up
+                    if attempt == 1:
+                        result = 'This is a beta feature, your question is not detail enough. Please help me learn by providing the question with more details. Thank you'
             print(result)
         else:
             return pre_require["content"]
