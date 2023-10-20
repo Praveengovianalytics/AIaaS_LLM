@@ -14,10 +14,10 @@ from core.settings import Param
 
 class LLM:
     def __init__(
-        self,
-        chain,
-        llm: Optional[Type[BaseLanguageModel]] = None,
-        retriever: FAISS = None,
+            self,
+            chain,
+            llm: Optional[Type[BaseLanguageModel]] = None,
+            retriever: FAISS = None,
             type: str = None
     ):
         """
@@ -38,8 +38,7 @@ class LLM:
         self.chain = chain
         self.llm = llm
         self.retriever = retriever
-        self.type=type
-
+        self.type = type
 
     def pre_check(self, query: str = None):
         """
@@ -72,7 +71,7 @@ class LLM:
         result = moderation_check(check1["content"], llm)
         return result
 
-    def predict(self, query: str = None, chat_history: list = None,intial_prompt:str=None):
+    def predict(self, query: str = None, chat_history: list = None, intial_prompt: str = None):
         """
         The predict function takes in a query and chat history, and returns an answer.
         The predict function is the main function of the bot. It takes in a user's query as well as
@@ -88,45 +87,41 @@ class LLM:
             A dictionary with the key &quot;answer&quot; and value as the answer
 
         """
-        pre_require = self.pre_check(query) if Param.JAILBREAK_CONTROL else {'check':'pass'}
-
+        pre_require = self.pre_check(query) if Param.JAILBREAK_CONTROL else {'check': 'pass'}
 
         if pre_require["check"] == "pass":
-            if self.type=='general':
+            if self.type == 'general':
                 result = self.chain(
                     {
-                        "question": query+" \n System: "+(str(intial_prompt) if str(intial_prompt) else Param.SYSTEM_PROMPT)+ "You do not respond as 'User' or pretend to be 'User'. You only response once. Please ensure that your answer is clear"
+                        "question": query + " \n System: " + (str(intial_prompt) if str(
+                            intial_prompt) else Param.SYSTEM_PROMPT) + "You do not respond as 'User' or pretend to be 'User'. You only response once. Please ensure that your answer is clear"
                         ,
                         "chat_history": [tuple(sublist) for sublist in chat_history],
                     }
                 )
             else:
-                result=''
-                for attempt in range(2):
-                    try:
-                        result = self.chain.run(query)
-                        break
-                    except Exception as e:
-                        response = str(e)
-
+                result = ''
+                try:
+                    result = self.chain.run(query)
+                except Exception as e:
+                    response = str(e)
+                    if 'Could not parse LLM output' in response:
                         response = response.removeprefix("Could not parse LLM output: `").removesuffix(
                             "`"
                         )
 
                         result = response  # Feed the response back into the agent
                         print(result)
-                    # If we've reached the maximum number of retries, give up
-                    if attempt == 1:
+                    else:
                         result = 'This is a beta feature, your question is not detail enough. Please help me learn by providing the question with more details. Thank you'
             print(result)
         else:
             return pre_require["content"]
-        if self.type=='general':
-            postcheck = self.post_check(result["answer"], self.llm) if Param.POST_CONTROL else {'content':result['answer']}
+        if self.type == 'general':
+            postcheck = self.post_check(result["answer"], self.llm) if Param.POST_CONTROL else {
+                'content': result['answer']}
             print(postcheck)
 
             return postcheck["content"]
         else:
             return result
-
-
