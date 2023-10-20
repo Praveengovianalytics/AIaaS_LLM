@@ -36,7 +36,7 @@ from core.controller.orchestration_layer.base import create_pandas_dataframe_age
 
 user_model_cache = cachetools.LRUCache(maxsize=1)
 callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
-n_gpu_layers = 30  # Change this value based on your model and your GPU VRAM pool.
+n_gpu_layers = 35  # Change this value based on your model and your GPU VRAM pool.
 n_batch = 256
 
 router = APIRouter()
@@ -183,6 +183,19 @@ def set_model(request: Request, response: Response, data: ModelRequest, authoriz
 
                 user_model_cache[auth["data"]["username"]] = {'model': custom_llm, 'config': data.config}
                 print('Created New Model in Cache')
+
+            return APIResponse(status="success", message='Model Initialisation Success')
+        except Exception:
+            return APIResponse(status="fail", message='Model Initialisation Failed')
+
+@router.post("/register_api_key")
+@limiter.limit("5/second")
+def register_api(request: Request, response: Response, data: ModelRequest, authorization: str = Header(None),
+              ):
+
+    auth = decodeJWT(authorization)
+    if auth["valid"]:
+        try:
 
             return APIResponse(status="success", message='Model Initialisation Success')
         except Exception:
