@@ -52,7 +52,7 @@ Uvicorn
 <div class="termy">
 
 ```console
-$ pip install aiaas-falcon
+$ git clone https://github.com/Praveengovianalytics/AIaaS_LLM.git -b master
 
 ---> 100%
 ```
