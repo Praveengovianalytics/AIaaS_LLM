@@ -269,7 +269,7 @@ def retrieve_model(data, username):
 
 @router.post("/predict")
 @limiter.limit("5/second")
-def predict(
+async def predict(
         request: Request,
         response: Response,
         data: PredictionRequest,
