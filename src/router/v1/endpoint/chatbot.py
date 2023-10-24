@@ -27,7 +27,6 @@ from core.controller.authentication_layer.jwt import decodeJWT
 from core.limiter import limiter
 from starlette.requests import Request
 from starlette.responses import Response
-from langchain.llms import LlamaCpp, VLLM
 from core.schema.prediction_request import ModelRequest
 
 from core.controller.orchestration_layer.science_pipeline import DataPipeline
@@ -35,6 +34,8 @@ from core.controller.orchestration_layer.science_pipeline import DataPipeline
 from core.controller.orchestration_layer.base import create_pandas_dataframe_agent
 
 from core.controller.authentication_layer.api_jwt import decodeAPIJWT
+
+from core.controller.orchestration_layer.llm_adaptation import VLLM
 
 ## Use In-Memory Ram
 
@@ -127,38 +128,35 @@ def health_check(request: Request, response: Response):
 
     return {"status": "healthy"}
 
-
-def build_model(data):
-    if data.type == 'general':
-        custom_llm = VLLM(
-            model=Param.LLM_MODEL[data.config['model']],
+model=VLLM(
+            model=Param.LLM_MODEL[Param.LLM_MODEL.keys()[0]],
             trust_remote_code=True,
-            max_new_tokens=data.config['max_new_tokens'] if data.config['max_new_tokens'] else Param.LLM_MAX_NEW_TOKENS,
-            temperature=data.config[
-                'temperature'] if 'temperature' in data.config else Param.LLM_TEMPERATURE,
-            top_k=data.config['top_k'] if 'top_k' in data.config else Param.TOP_K,
-            top_p=data.config['top_p'] if 'top_p' in data.config else Param.TOP_P,
-            n_gpu_layers=n_gpu_layers,
-            n_batch=n_batch,
-            batch_size=data.config['batch_size'] if 'batch_size' in data.config else Param.BATCH_SIZE,
-            context_length=data.config[
-                'context_length'] if 'context_length' in data.config else Param.LLM_CONTEXT_LENGTH,
-            callback_manager=callback_manager,
+            batch_size= Param.BATCH_SIZE,
+            context_length=Param.LLM_CONTEXT_LENGTH,
             n_ctx=4000,
             verbose=True,  # Verbose is required to pass to the callback manager
         )
+def build_model(data):
+    if data.type == 'general':
+        custom_llm = model.set_param(max_new_tokens = data.config['max_new_tokens'] if data.config['max_new_tokens'] else Param.LLM_MAX_NEW_TOKENS,
+        temperature = data.config[
+            'temperature'] if 'temperature' in data.config else Param.LLM_TEMPERATURE,
+        top_k = data.config['top_k'] if 'top_k' in data.config else Param.TOP_K,
+        top_p = data.config['top_p'] if 'top_p' in data.config else Param.TOP_P)
+
     else:
         custom_llm = VLLM(
             model=Param.LLM_MODEL[data.config['model']],
             trust_remote_code=True,
             temperature=0,
-            n_gpu_layers=n_gpu_layers,
-            n_batch=n_batch,
             max_tokens=8000,
-            callback_manager=callback_manager,
             n_ctx=4000,
             verbose=True,  # Verbose is required to pass to the callback manager
         )
+        model.set_param(
+            max_new_tokens=8000,
+            temperature=0)
+
     return custom_llm
 
 
