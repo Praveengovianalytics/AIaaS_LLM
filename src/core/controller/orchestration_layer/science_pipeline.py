@@ -6,7 +6,7 @@ from langchain.schema import OutputParserException
 class DataPipeline:
     def __init__(self, directory_path):
         self.allowed_extensions = ['.csv', '.json', '.xlsx', '.xml', '.xls']
-        self.files = [f for f in os.listdir(directory_path) if
+        self.files = [os.path.join(directory_path, f) for f in os.listdir(directory_path) if
                       not f.startswith('.') and any(f.endswith(ext) for ext in self.allowed_extensions)]
 
     def load_pd(self, file_path):

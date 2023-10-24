@@ -1,3 +1,5 @@
+import datetime
+import logging
 import os
 
 import cachetools
@@ -6,7 +8,6 @@ from fastapi import APIRouter, Header, HTTPException, Form, Security
 import shutil
 
 from fastapi.security import APIKeyHeader
-from langchain.agents import create_pandas_dataframe_agent
 from langchain.callbacks import StreamingStdOutCallbackHandler
 from langchain.callbacks.manager import CallbackManager
 from langchain.chains import ConversationalRetrievalChain
@@ -31,11 +32,15 @@ from core.schema.prediction_request import ModelRequest
 
 from core.controller.orchestration_layer.science_pipeline import DataPipeline
 
+from core.controller.orchestration_layer.base import create_pandas_dataframe_agent
+
+from core.controller.authentication_layer.api_jwt import decodeAPIJWT
+
 ## Use In-Memory Ram
 
-user_model_cache = cachetools.LRUCache(maxsize=2)
+user_model_cache = cachetools.LRUCache(maxsize=1)
 callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
-n_gpu_layers = 40  # Change this value based on your model and your GPU VRAM pool.
+n_gpu_layers = 35  # Change this value based on your model and your GPU VRAM pool.
 n_batch = 256
 
 router = APIRouter()
@@ -118,6 +123,8 @@ def health_check(request: Request, response: Response):
     Returns:
         A dictionary with a key of &quot;status&quot; and a value of &quot;healthy&quot;
     """
+    print(request.url)
+
     return {"status": "healthy"}
 
 
@@ -167,7 +174,8 @@ def set_model(request: Request, response: Response, data: ModelRequest, authoriz
     Returns:
         A dictionary with a key of &quot;status&quot; and a value of &quot;healthy&quot;
     """
-    auth = decodeJWT(authorization)
+    auth = decodeJWT(authorization,request.url)
+
     if auth["valid"]:
         try:
             exist = ''
@@ -207,19 +215,20 @@ def create_embedding(
 
     Returns:
         A success message if the embedding is created successfully"""
-    auth = decodeJWT(authorization)
+    auth = decodeJWT(authorization,request.url)
+
     if auth["valid"]:
         user_folder = Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/"
         if os.path.exists(user_folder):
             shutil.rmtree(user_folder)
-        else:
-            os.makedirs(user_folder)
-            os.makedirs(user_folder+'data/')
-            os.makedirs(user_folder+'embedding/')
+
+        os.makedirs(user_folder)
+        os.makedirs(user_folder + 'data/')
+        os.makedirs(user_folder + 'embedding/')
 
         file_list = []
 
-        for index,infile in enumerate(file):
+        for index, infile in enumerate(file):
             file_location = f"{Param.EMBEDDING_SAVE_PATH}/{auth['data']['username']}/data/{infile.filename}.{extension[index]}"
             with open(file_location, "wb+") as file_object:
                 file_object.write(infile.file.read())
@@ -274,10 +283,11 @@ async def predict(
 
     Returns:
         A predictions response"""
-    auth = decodeJWT(authorization)
+    auth = decodeJWT(authorization,request.url)
+
     if auth["valid"]:
         llms = retrieve_model(data, auth["data"]["username"])
-        if data.type=='general':
+        if data.type == 'general':
             retriever = load_embedding(
                 Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/embedding/"
             )
@@ -286,17 +296,27 @@ async def predict(
                 llm=llms, retriever=retriever.as_retriever(search_type="similarity_score_threshold", search_kwargs={
                     'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX),
                     'fetch_k': (
-                        data.conversation_config['fetch_k'] if data.conversation_config['fetch_k'] else Param.FETCH_INDEX),
+                        data.conversation_config['fetch_k'] if data.conversation_config[
+                            'fetch_k'] else Param.FETCH_INDEX),
                     "score_threshold": .1}), verbose=True
             )
-            result = LLM(chain, llms, retriever,'general').predict(data.query, data.chat_history[-3:] if len(
+            result = LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
                 data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'])
         else:
-            data=DataPipeline(Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/data/")
-            data=data.process()
-            agent = create_pandas_dataframe_agent(llms, data, verbose=True, number_of_head_rows=5,
-                                                  prefix="Follow the given template for your response. Do not use the sample table data provided to you, as it's incomplete and can result in incorrect inferences. Use answers in the Observation. You should not making any assumption about the data in Thought. When crafting your response, consistently designate the Action as 'python_repl_ast'. Once you've reached your conclusion, sign off your response with 'Final Answer: <your final answer>'.")
-            result= LLM(agent,llms,None,'data').predict(data.query)
+            datadf = DataPipeline(Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/data/")
+            datadf = datadf.process()
+            agent = create_pandas_dataframe_agent(llms, datadf, verbose=True, number_of_head_rows=5,
+                                                  handle_parsing_errors=True,
+                                                  prefix="Follow the given template for your response. Do not use the "
+                                                         "sample table data provided to you, as it's incomplete and "
+                                                         "can result in incorrect inferences. Use answers in the "
+                                                         "Observation. You should not making any assumption about the "
+                                                         "data in Thought. When crafting your response, consistently "
+                                                         "designate the Action as 'python_repl_ast'. Once you've "
+                                                         "reached your conclusion, sign off your response with 'Final "
+                                                         "Answer: <your final answer>'.")
+
+            result = LLM(agent, llms, None, 'data').predict(data.query)
 
         return APIResponse(status="success", message=result)
     else:
@@ -324,7 +344,8 @@ def feedback(
 
     Returns:
         A json object with the status and message"""
-    auth = decodeJWT(authorization)
+    auth = decodeJWT(authorization,request.url)
+
     if auth["valid"]:
         with open(
                 Param.FEEDBACK_LOG_FILE + "feedback_" + auth["data"]["username"] + ".txt",
@@ -348,11 +369,12 @@ def feedback(
 
 
 api_key_header = APIKeyHeader(name="X-API-Key")
-api_keys = ['TESTKEY123']
 
 
-def get_api_key(api_key_header: str = Security(api_key_header)) -> str:
-    if api_key_header in api_keys:
+def get_api_key(api_key_header: str = Security(api_key_header),request: Request='') -> str:
+    datas=decodeAPIJWT(api_key_header)
+    if datas['valid']:
+        logging.info(f'{datetime.datetime.now()} - {request.url}:{datas.data}')
         return api_key_header
     raise HTTPException(
         status_code=401,
@@ -364,7 +386,7 @@ def get_api_key(api_key_header: str = Security(api_key_header)) -> str:
 def create_embedding(
         request: Request,
         response: Response,
-        file: List[UploadFile] = Form(...), extension: List[str] = Form(...),
+        file: List[UploadFile] = Form(...), extension: List[str] = Form(...), type: str = Form(...),
         api_key: str = Security(get_api_key),
 ):
     """
@@ -383,10 +405,10 @@ def create_embedding(
     user_folder = Param.EMBEDDING_SAVE_PATH + api_key + "/"
     if os.path.exists(user_folder):
         shutil.rmtree(user_folder)
-    else:
-        os.makedirs(user_folder)
-        os.makedirs(user_folder + 'data/')
-        os.makedirs(user_folder + 'embedding/')
+
+    os.makedirs(user_folder)
+    os.makedirs(user_folder + 'data/')
+    os.makedirs(user_folder + 'embedding/')
 
     file_list = []
 
@@ -432,16 +454,26 @@ def predict(
             llm=llms, retriever=retriever.as_retriever(search_type="similarity_score_threshold", search_kwargs={
                 'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX),
                 'fetch_k': (
-                    data.conversation_config['fetch_k'] if data.conversation_config['fetch_k'] else Param.FETCH_INDEX),
+                    data.conversation_config['fetch_k'] if data.conversation_config[
+                        'fetch_k'] else Param.FETCH_INDEX),
                 "score_threshold": .1}), verbose=True
         )
         result = LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
             data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'])
     else:
-        data = DataPipeline(Param.EMBEDDING_SAVE_PATH + api_key + "/data/")
-        data = data.process()
-        agent = create_pandas_dataframe_agent(llms, data, verbose=True, number_of_head_rows=5,
-                                              prefix="Follow the given template for your response. Do not use the sample table data provided to you, as it's incomplete and can result in incorrect inferences. Use answers in the Observation. You should not making any assumption about the data in Thought. When crafting your response, consistently designate the Action as 'python_repl_ast'. Once you've reached your conclusion, sign off your response with 'Final Answer: <your final answer>'.")
+        datadf = DataPipeline(Param.EMBEDDING_SAVE_PATH + api_key + "/data/")
+        datadf = datadf.process()
+        agent = create_pandas_dataframe_agent(llms, datadf, verbose=True, number_of_head_rows=5,
+                                              handle_parsing_errors=True,
+                                              prefix="Follow the given template for your response. Do not use the "
+                                                     "sample table data provided to you, as it's incomplete and "
+                                                     "can result in incorrect inferences. Use answers in the "
+                                                     "Observation. You should not making any assumption about the "
+                                                     "data in Thought. When crafting your response, consistently "
+                                                     "designate the Action as 'python_repl_ast'. Once you've "
+                                                     "reached your conclusion, sign off your response with 'Final "
+                                                     "Answer: <your final answer>'.")
+
         result = LLM(agent, llms, None, 'data').predict(data.query)
 
     return APIResponse(status="success", message=result)

@@ -18,3 +18,25 @@ class LoginResponse(BaseModel):
     status: str
     username: str
     token: str
+
+
+class APIKeyNewResponse(BaseModel):
+    """
+    Login Response Model
+    """
+
+    status: str
+    api: str
+
+
+class APIKEYRequest(BaseModel):
+    """
+    Login Response Model
+    """
+
+    email: str
+    username: str
+    email: str
+    department: str
+    project: str
+    day: int

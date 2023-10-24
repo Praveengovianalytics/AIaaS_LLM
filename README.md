@@ -1,89 +1,185 @@
-# BTO_LLM_App
+<p align="center">
+  <a href="https://github.com/Praveengovianalytics/AIaaS_falcon"><img src="https://github.com/Praveengovianalytics/AIaaS_falcon/raw/master/img/AIAAS_FALCON.jpg" alt="AIaaS_LLM"></a>
+</p>
+<p align="center">
+    <em>Brainwave, high performance, easy to use, fast to infer, ready for production</em>
+</p>
+<p align="center">
+
+<a href="https://pypi.org/project/fastapi" target="_blank">
+    <img src="https://img.shields.io/pypi/v/aiaas-falcon?color=%2334D058&label=pypi%20package" alt="Package version">
+</a>
+<a href="https://pypi.org/project/fastapi" target="_blank">
+    <img src="https://img.shields.io/pypi/pyversions/aiaas-falcon.svg?color=%2334D058" alt="Supported Python versions">
+</a>
+</p>
+
+---
+
+**Documentation**: <a href="https://www.google.com" target="_blank">https://www.google.com</a>
+
+**Source Code**: <a href="https://github.com/Praveengovianalytics/AIaaS_LLM" target="_blank">https://github.com/Praveengovianalytics/AIaaS_LLM</a>
+
+---
 
 This repository constitutes the foundational backend infrastructure for the BrainWave Application. The application is primarily built upon the FastAPI framework to serve as the backbone for its API functionalities. It mandates the use of Python version 3.10.0 or higher to ensure compatibility and optimal performance.
 
 Notably, the application leverages the Langchain library to facilitate the seamless loading of the underlying LLM model, showcasing a commitment to robust and cutting-edge technology integration. This repository serves as the cornerstone for the BrainWave Application's server-side operations, enabling efficient data processing and interaction with the LLM.
 
-## Tools used in this project
-* [Poetry](https://towardsdatascience.com/how-to-effortlessly-publish-your-python-package-to-pypi-using-poetry-44b305362f9f): Dependency management - [article](https://mathdatasimplified.com/2023/06/12/poetry-a-better-way-to-manage-python-dependencies/)
-* [hydra](https://hydra.cc/): Manage configuration files - [article](https://mathdatasimplified.com/2023/05/25/stop-hard-coding-in-a-data-science-project-use-configuration-files-instead/)
-* [pre-commit plugins](https://pre-commit.com/): Automate code reviewing formatting
-* [DVC](https://dvc.org/): Data version control - [article](https://mathdatasimplified.com/2023/02/20/introduction-to-dvc-data-version-control-tool-for-machine-learning-projects-2/)
-* [pdoc](https://github.com/pdoc3/pdoc): Automatically create an API documentation for your project
+The key features are:
 
-## Set up the environment
-1. Install [Poetry](https://python-poetry.org/docs/#installation)
-2. Set up the environment:
-```bash
-make env 
+* **Fast**: Very high performance, on par with 7b, 13b and 34b gguf models
+* **Easy**: Designed to be easy to use and learn. Less time reading data and documentations.
+* **Short**: Minimize time spent on finding and analysing data.
+
+## Sponsors
+
+<!-- sponsors -->
+No Sponsors for Now
+<!-- /sponsors -->
+
+## Requirements
+
+Python 3.9+
+LLamaCpp
+Fastapi
+Transformers 
+Sentence-Transformers
+Uvicorn
+
+## Installation
+
+<div class="termy">
+
+```console
+$ git clone https://github.com/Praveengovianalytics/AIaaS_LLM.git -b master
+
+---> 100%
 ```
 
-## Install dependencies
-To install all dependencies for this project, run:
-```bash
-poetry install
+</div>
+
+You will also need an ASGI server, for production:  <a href="https://www.uvicorn.org" class="external-link" target="_blank">Uvicorn</a>.
+
+<div class="termy">
+
+```console
+$ pip install "uvicorn[standard]"
+
+---> 100%
 ```
 
-To install a new package, run:
-```bash
-poetry add <package-name>
+</div>
+
+## Example
+
+### Run it
+
+Run the server with:
+
+<div class="termy">
+
+```console
+$ python main.py
+
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [28720]
+INFO:     Started server process [28722]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
 ```
 
-## Start Application
-To start the application, enter the src directory:
+</div>
 
-```bash
-cd src
+<details markdown="1">
+<summary>About the command <code> python main.py --port 8000  </code>...</summary>
 
+The command `python main.py` refers to:
+
+* `main`: the file `main.py` (the Python "module").
+* `port`: the port number
+
+
+</details>
+
+### Check it
+
+Open your browser at <a href="http://127.0.0.1:8000/v1/chat/ping" class="external-link" target="_blank">http://127.0.0.1:8000/v1/chat/ping</a>.
+
+You will see the JSON response as:
+
+```JSON
+{"status":"healthy"}
 ```
 
-
-Then run:
-```bash
-python main.py --port <port-number>
-
-```
+You already started the backend API server successfully.
 
 
-OR
+### Making Postman Request
 
-Set Port Number In src/core/settings.py:
-```bash
-PORT_NUMBER=8000
+#### Login
 
-```
+In order to retrieve a JWT token for API access, you need to first request the /v1/auth/login API.
+![image](https://github.com/Praveengovianalytics/AIaaS_LLM/assets/59607914/9d4782a5-0de6-4d5f-8f56-7a79e3032e99)
 
-Then run:
-```bash
-python main.py 
+Copy the token to the authentication header and you are good to go.
+![image](https://github.com/Praveengovianalytics/AIaaS_LLM/assets/59607914/53645965-6474-4afd-86b5-b80e272248de)
 
-```
 
-Note: Direct Calling Through Args On Running Will Be Prioritised
 
-## Version your data
-To track changes to the "data" directory, type:
-```bash
-dvc add data
-```
+#### Create Embedding
+Now, we will upload the file to create the embedding for chat.
+First, go to body, switch the content mode to form-data and fill in the fields. The type can either be a 'general' or 'data' according to your needs.
+- General Mode will be for general enquires.
+- Data Mode will enable pandas based conversation where number and count is important.
+![image](https://github.com/Praveengovianalytics/AIaaS_LLM/assets/59607914/21c8ed82-9b30-4a18-9ad4-70ccff5685f2)
 
-This command will create the "data.dvc" file, which contains a unique identifier and the location of the data directory in the file system.
+#### Set Model
 
-To keep track of the data associated with a particular version, commit the "data.dvc" file to Git:
-```bash
-git add data.dvc
-git commit -m "add data"
-```
+Now, we should initialize the model for usage. The list of models available can be retrieve by GET /v1/chat/get_model. The data pandas mode models does not support custom params at the moment.
+![image](https://github.com/Praveengovianalytics/AIaaS_LLM/assets/59607914/c8483468-9b49-4b82-9009-039cd74185d6)
 
-To push the data to remote storage, type:
-```bash
-dvc push 
-```
+#### Predict
 
-## Auto-generate API documentation
+Finally, we can make predictions. 
+- "query": What we want to ask
+- "config": The configuration must be set same as what we set for "Set Model" API. 
+- "conversation_config": Chat config can be adjusted according to custom need and document size for effective query
+- "use_default": Deprecated
+- "type": "general" or "data"
+![image](https://github.com/Praveengovianalytics/AIaaS_LLM/assets/59607914/3b5016c9-eba1-442b-93ce-fea7dba6e5ee)
 
-To auto-generate API document for your project, run:
 
-```bash
-make docs
-```
+### Interactive API docs
+
+Now go to <a href="http://127.0.0.1:8000/docs" class="external-link" target="_blank">http://127.0.0.1:8000/docs</a>.
+
+You will see the automatic interactive API documentation (provided by <a href="https://github.com/swagger-api/swagger-ui" class="external-link" target="_blank">Swagger UI</a>):
+
+![Swagger UI](https://fastapi.tiangolo.com/img/index/index-01-swagger-ui-simple.png)
+
+
+### Alternative API docs
+
+And now, go to <a href="http://127.0.0.1:8000/redoc" class="external-link" target="_blank">http://127.0.0.1:8000/redoc</a>.
+
+You will see the alternative automatic documentation (provided by <a href="https://github.com/Rebilly/ReDoc" class="external-link" target="_blank">ReDoc</a>):
+
+![ReDoc](https://fastapi.tiangolo.com/img/index/index-02-redoc-simple.png)
+
+
+
+
+
+
+## Performance
+
+To Be Filled
+
+## Authors
+- [@Praveengovianalytics](https://github.com/Praveengovianalytics)
+- [@zhuofan-16](https://github.com/zhuofan-16)
+
+## License
+
+This project is licensed under the terms of the MIT license.
