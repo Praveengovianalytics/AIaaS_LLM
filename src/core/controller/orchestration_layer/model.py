@@ -71,7 +71,7 @@ class LLM:
         result = moderation_check(check1["content"], llm)
         return result
 
-    def predict(self, query: str = None, chat_history: list = None, intial_prompt: str = None):
+    async def predict(self, query: str = None, chat_history: list = None, intial_prompt: str = None):
         """
         The predict function takes in a query and chat history, and returns an answer.
         The predict function is the main function of the bot. It takes in a user's query as well as
@@ -91,7 +91,7 @@ class LLM:
 
         if pre_require["check"] == "pass":
             if self.type == 'general':
-                result = self.chain(
+                result = await self.chain.acall(
                     {
                         "question": query + " \n System: " + (str(intial_prompt) if str(
                             intial_prompt) else Param.SYSTEM_PROMPT) + "You do not respond as 'User' or pretend to be 'User'. You only response once. Please ensure that your answer is clear"
@@ -102,7 +102,7 @@ class LLM:
             else:
                 result = ''
                 try:
-                    result = self.chain.run(query)
+                    result = await self.chain.arun(query)
                 except Exception as e:
                     response = str(e)
                     if 'Could not parse LLM output' in response:

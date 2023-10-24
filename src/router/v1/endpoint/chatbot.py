@@ -128,21 +128,25 @@ def health_check(request: Request, response: Response):
 
     return {"status": "healthy"}
 
-model=VLLM(
-            model=Param.LLM_MODEL[list(Param.LLM_MODEL.keys())[0]],
-            trust_remote_code=True,
-            batch_size= Param.BATCH_SIZE,
-            context_length=Param.LLM_CONTEXT_LENGTH,
-            n_ctx=4000,
-            verbose=True,  # Verbose is required to pass to the callback manager
-        )
+
+model = VLLM(
+    model=Param.LLM_MODEL[list(Param.LLM_MODEL.keys())[0]],
+    trust_remote_code=True,
+    batch_size=Param.BATCH_SIZE,
+    context_length=Param.LLM_CONTEXT_LENGTH,
+    n_ctx=4000,
+    verbose=True,  # Verbose is required to pass to the callback manager
+)
+
+
 def build_model(data):
     if data.type == 'general':
-        custom_llm = model.set_param(max_new_tokens = data.config['max_new_tokens'] if data.config['max_new_tokens'] else Param.LLM_MAX_NEW_TOKENS,
-        temperature = data.config[
-            'temperature'] if 'temperature' in data.config else Param.LLM_TEMPERATURE,
-        top_k = data.config['top_k'] if 'top_k' in data.config else Param.TOP_K,
-        top_p = data.config['top_p'] if 'top_p' in data.config else Param.TOP_P)
+        custom_llm = model.set_param(
+            max_new_tokens=data.config['max_new_tokens'] if data.config['max_new_tokens'] else Param.LLM_MAX_NEW_TOKENS,
+            temperature=data.config[
+                'temperature'] if 'temperature' in data.config else Param.LLM_TEMPERATURE,
+            top_k=data.config['top_k'] if 'top_k' in data.config else Param.TOP_K,
+            top_p=data.config['top_p'] if 'top_p' in data.config else Param.TOP_P)
 
     else:
         custom_llm = VLLM(
@@ -174,7 +178,7 @@ def set_model(request: Request, response: Response, data: ModelRequest, authoriz
     Returns:
         A dictionary with a key of &quot;status&quot; and a value of &quot;healthy&quot;
     """
-    auth = decodeJWT(authorization,request.url)
+    auth = decodeJWT(authorization, request.url)
 
     if auth["valid"]:
         try:
@@ -215,7 +219,7 @@ def create_embedding(
 
     Returns:
         A success message if the embedding is created successfully"""
-    auth = decodeJWT(authorization,request.url)
+    auth = decodeJWT(authorization, request.url)
 
     if auth["valid"]:
         user_folder = Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/"
@@ -283,7 +287,7 @@ def predict(
 
     Returns:
         A predictions response"""
-    auth = decodeJWT(authorization,request.url)
+    auth = decodeJWT(authorization, request.url)
 
     if auth["valid"]:
         llms = retrieve_model(data, auth["data"]["username"])
@@ -300,7 +304,7 @@ def predict(
                             'fetch_k'] else Param.FETCH_INDEX),
                     "score_threshold": .1}), verbose=True
             )
-            result = LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
+            result = await LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
                 data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'])
         else:
             datadf = DataPipeline(Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/data/")
@@ -316,7 +320,7 @@ def predict(
                                                          "reached your conclusion, sign off your response with 'Final "
                                                          "Answer: <your final answer>'.")
 
-            result = LLM(agent, llms, None, 'data').predict(data.query)
+            result =await LLM(agent, llms, None, 'data').predict(data.query)
 
         return APIResponse(status="success", message=result)
     else:
@@ -344,7 +348,7 @@ def feedback(
 
     Returns:
         A json object with the status and message"""
-    auth = decodeJWT(authorization,request.url)
+    auth = decodeJWT(authorization, request.url)
 
     if auth["valid"]:
         with open(
@@ -371,8 +375,8 @@ def feedback(
 api_key_header = APIKeyHeader(name="X-API-Key")
 
 
-def get_api_key(api_key_header: str = Security(api_key_header),request: Request='') -> str:
-    datas=decodeAPIJWT(api_key_header)
+def get_api_key(api_key_header: str = Security(api_key_header), request: Request = '') -> str:
+    datas = decodeAPIJWT(api_key_header)
     if datas['valid']:
         logging.info(f'{datetime.datetime.now()} - {request.url}:{datas.data}')
         return api_key_header
