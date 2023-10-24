@@ -129,7 +129,7 @@ def health_check(request: Request, response: Response):
     return {"status": "healthy"}
 
 model=VLLM(
-            model=Param.LLM_MODEL[Param.LLM_MODEL.keys()[0]],
+            model=Param.LLM_MODEL[list(Param.LLM_MODEL.keys())[0]],
             trust_remote_code=True,
             batch_size= Param.BATCH_SIZE,
             context_length=Param.LLM_CONTEXT_LENGTH,
