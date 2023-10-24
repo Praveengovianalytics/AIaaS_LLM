@@ -27,7 +27,7 @@ from core.controller.authentication_layer.jwt import decodeJWT
 from core.limiter import limiter
 from starlette.requests import Request
 from starlette.responses import Response
-from langchain.llms import LlamaCpp
+from langchain.llms import LlamaCpp, VLLM
 from core.schema.prediction_request import ModelRequest
 
 from core.controller.orchestration_layer.science_pipeline import DataPipeline
@@ -130,8 +130,9 @@ def health_check(request: Request, response: Response):
 
 def build_model(data):
     if data.type == 'general':
-        custom_llm = LlamaCpp(
-            model_path=Param.LLM_MODEL[data.config['model']],
+        custom_llm = VLLM(
+            model=Param.LLM_MODEL[data.config['model']],
+            trust_remote_code=True,
             max_new_tokens=data.config['max_new_tokens'] if data.config['max_new_tokens'] else Param.LLM_MAX_NEW_TOKENS,
             temperature=data.config[
                 'temperature'] if 'temperature' in data.config else Param.LLM_TEMPERATURE,
@@ -147,8 +148,9 @@ def build_model(data):
             verbose=True,  # Verbose is required to pass to the callback manager
         )
     else:
-        custom_llm = LlamaCpp(
-            model_path=Param.DATA_LLM_MODEL[data.config['model']],
+        custom_llm = VLLM(
+            model=Param.LLM_MODEL[data.config['model']],
+            trust_remote_code=True,
             temperature=0,
             n_gpu_layers=n_gpu_layers,
             n_batch=n_batch,

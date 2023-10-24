@@ -9,17 +9,12 @@ class Param:
     LLM_MODEL_TYPE = "llama"
     # Default Model Configuration
     LLM_MODEL = {
-        'mistral-7b': f"{APP_PATH}models/mistral-7b-openorca.Q4_K_M.gguf",
-        'zephyr-7b': f"{APP_PATH}models/zephyr-7b-alpha.Q4_K_M.gguf",
-                      'llama2-7b': f"{APP_PATH}models/llama-2-7b-chat.Q4_K_M.gguf",
-        'llama2-13b': f"{APP_PATH}models/llama-2-13b-chat.Q4_K_M.gguf"
+        'Llama2-13b': "meta-llama/Llama-2-13b-hf"
 
 
     }
     DATA_LLM_MODEL = {
-        'WizardCoder-34B': f"{APP_PATH}models/WizardLM-WizardCoder-Python-34B-V1.0.Q4_K_M.gguf",
-        'Ziya-34B': f"{APP_PATH}models/ziya-coding-34b-v1.0.Q4_K_M.gguf",
-        'CodeFuse-34B': f"{APP_PATH}models/codefuse-codellama-34b.Q4_K_M.gguf"
+        'Llama2-13b': "meta-llama/Llama-2-13b-hf"
 
     }
     LLM_MAX_NEW_TOKENS = 4000
