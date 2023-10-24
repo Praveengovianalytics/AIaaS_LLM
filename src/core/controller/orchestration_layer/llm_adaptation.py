@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict, List, Optional
 
 from langchain.callbacks.manager import CallbackManagerForLLMRun
@@ -134,6 +135,8 @@ class VLLM(BaseLLM):
 
         # build sampling parameters
         params = {**self._default_params, **kwargs, "stop": stop}
+        print(self._default_params)
+        logging.info(self._default_params)
         sampling_params = SamplingParams(**params)
         # call the model
         outputs = self.client.generate(prompts, sampling_params)

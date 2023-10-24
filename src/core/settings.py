@@ -9,12 +9,12 @@ class Param:
     LLM_MODEL_TYPE = "llama"
     # Default Model Configuration
     LLM_MODEL = {
-        'Llama2-13b': "meta-llama/Llama-2-13b-hf"
+        'Opt 125M': "facebook/opt-125m"
 
 
     }
     DATA_LLM_MODEL = {
-        'Llama2-13b': "meta-llama/Llama-2-13b-hf"
+        'Opt 125M': "facebook/opt-125m"
 
     }
     LLM_MAX_NEW_TOKENS = 4000
