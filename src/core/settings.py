@@ -10,7 +10,7 @@ class Param:
     # Default Model Configuration
     LLM_MODEL = {
         'mistral-7b': f"{APP_PATH}models/mistral-7b-openorca.Q4_K_M.gguf",
-        'zephyr-7b': f"{APP_PATH}models/zephyr-7b-alpha.Q4_K_M.gguf",
+        'zephyr-7b': f"{APP_PATH}models/zephyr-7b-beta.Q4_K_M.gguf",
                       'llama2-7b': f"{APP_PATH}models/llama-2-7b-chat.Q4_K_M.gguf",
         'llama2-13b': f"{APP_PATH}models/llama-2-13b-chat.Q4_K_M.gguf"
 

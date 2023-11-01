@@ -132,16 +132,12 @@ def build_model(data):
     if data.type == 'general':
         custom_llm = LlamaCpp(
             model_path=Param.LLM_MODEL[data.config['model']],
-            max_new_tokens=data.config['max_new_tokens'] if data.config['max_new_tokens'] else Param.LLM_MAX_NEW_TOKENS,
             temperature=data.config[
                 'temperature'] if 'temperature' in data.config else Param.LLM_TEMPERATURE,
             top_k=data.config['top_k'] if 'top_k' in data.config else Param.TOP_K,
             top_p=data.config['top_p'] if 'top_p' in data.config else Param.TOP_P,
             n_gpu_layers=n_gpu_layers,
             n_batch=n_batch,
-            batch_size=data.config['batch_size'] if 'batch_size' in data.config else Param.BATCH_SIZE,
-            context_length=data.config[
-                'context_length'] if 'context_length' in data.config else Param.LLM_CONTEXT_LENGTH,
             callback_manager=callback_manager,
             n_ctx=4000,
             verbose=True,  # Verbose is required to pass to the callback manager
