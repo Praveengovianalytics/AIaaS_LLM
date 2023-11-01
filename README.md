@@ -125,6 +125,22 @@ In order to retrieve a JWT token for API access, you need to first request the /
 Copy the token to the authentication header and you are good to go.
 ![image](https://github.com/Praveengovianalytics/AIaaS_LLM/assets/59607914/53645965-6474-4afd-86b5-b80e272248de)
 
+#### Create New API Key
+In order to use the Falcon Library, a API Key need to be created. The request URL is /v1/auth/register_api_key.
+The Body needed are as of the following:
+
+{
+
+    "username":"SINGTEL USERNAME (START WITH P)",
+    "project":"PROJECT_CODE",
+    "department":"DEPARTMENT",
+    "email":"SINGTEL EMAIL",
+    "day":20
+}
+
+*Please Note that Bearer Token is needed for this API*
+
+![image](https://github.com/Praveengovianalytics/AIaaS_LLM/assets/59607914/3348c403-5c3f-4625-ad3f-ec542d4de78f)
 
 
 #### Create Embedding
@@ -132,6 +148,8 @@ Now, we will upload the file to create the embedding for chat.
 First, go to body, switch the content mode to form-data and fill in the fields. The type can either be a 'general' or 'data' according to your needs.
 - General Mode will be for general enquires.
 - Data Mode will enable pandas based conversation where number and count is important.
+*Please Note that Bearer Token is needed for this API*
+
 ![image](https://github.com/Praveengovianalytics/AIaaS_LLM/assets/59607914/21c8ed82-9b30-4a18-9ad4-70ccff5685f2)
 
 #### Set Model
@@ -147,6 +165,8 @@ Finally, we can make predictions.
 - "conversation_config": Chat config can be adjusted according to custom need and document size for effective query
 - "use_default": Deprecated
 - "type": "general" or "data"
+*Please Note that Bearer Token is needed for this API*
+
 ![image](https://github.com/Praveengovianalytics/AIaaS_LLM/assets/59607914/3b5016c9-eba1-442b-93ce-fea7dba6e5ee)
 
 
