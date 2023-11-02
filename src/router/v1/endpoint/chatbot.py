@@ -8,6 +8,7 @@ from fastapi import APIRouter, Header, HTTPException, Form, Security
 import shutil
 
 from fastapi.security import APIKeyHeader
+from langchain import OpenAI
 from langchain.callbacks import StreamingStdOutCallbackHandler
 from langchain.callbacks.manager import CallbackManager
 from langchain.chains import ConversationalRetrievalChain
@@ -370,7 +371,7 @@ api_key_header = APIKeyHeader(name="X-API-Key")
 def get_api_key(api_key_header: str = Security(api_key_header),request: Request='') -> str:
     datas=decodeAPIJWT(api_key_header)
     if datas['valid']:
-        logging.info(f'{datetime.datetime.now()} - {request.url}:{datas.data}')
+        logging.info(f'{datetime.datetime.now()} - {request.url}:{datas}')
         return api_key_header
     raise HTTPException(
         status_code=401,
@@ -418,6 +419,11 @@ def create_embedding(
     embedding.save_db_local()
 
     return APIResponse(status="success", message="Embedding Created Success")
+import os
+
+os.environ["OPENAI_API_TYPE"] = "azure"
+os.environ["OPENAI_API_VERSION"] = "2023-05-15"
+from langchain.llms import AzureOpenAI
 
 
 @router.post("/predictLB")
@@ -440,7 +446,13 @@ def predict(
     Returns:
         A predictions response"""
 
-    llms = retrieve_model(data, api_key)
+    if data.config['model']=='openai':
+        os.environ["OPENAI_API_KEY"] = data.config['api_key']
+        os.environ["OPENAI_API_BASE"] = data.config['api_address']
+        llms=AzureOpenAI(model_name='gpt-3.5-turbo-16k',engine='gpt-35-turbo-16k-0613-vanilla')
+    else:
+        llms = retrieve_model(data, api_key)
+
     if data.type == 'general':
         retriever = load_embedding(
             Param.EMBEDDING_SAVE_PATH + api_key + "/embedding/"

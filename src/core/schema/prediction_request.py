@@ -18,3 +18,15 @@ class PredictionRequest(BaseModel):
     use_default:int
     config:dict
     conversation_config:dict
+
+class PredictionRequestAPI(BaseModel):
+    """
+    Prediction Request Model
+    """
+
+    query: str
+    type:str
+    chat_history: list
+    use_default:int
+    config:dict
+    conversation_config:dict
