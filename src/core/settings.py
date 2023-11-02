@@ -36,8 +36,8 @@ class Param:
     SELECT_INDEX = 10
     SYSTEM_PROMPT = ("Do note that Your are a data dictionary bot. Your task is to fully answer the user's query based "
                      "on the information provided to you.")
-    EMBEDDING_MODEL_PATH = f"{APP_PATH}models/all-MiniLM-L6-v2"
-    EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+    EMBEDDING_MODEL_PATH = f"{APP_PATH}models/bge-large-en"
+    EMBEDDING_MODEL_NAME = "BAAI/bge-large-en"
     EMBEDDING_DEVICE = "cuda"
     CSV_DELIMITER = ","
     CSV_ENCODING = "utf-8"
