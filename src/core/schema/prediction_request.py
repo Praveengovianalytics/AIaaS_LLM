@@ -30,3 +30,4 @@ class PredictionRequestAPI(BaseModel):
     use_default:int
     config:dict
     conversation_config:dict
+    use_file:int

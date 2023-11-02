@@ -37,6 +37,8 @@ from core.controller.orchestration_layer.base import create_pandas_dataframe_age
 
 from core.controller.authentication_layer.api_jwt import decodeAPIJWT
 
+from core.schema.prediction_request import PredictionRequestAPI
+
 ## Use In-Memory Ram
 
 user_model_cache = cachetools.LRUCache(maxsize=1)
@@ -298,7 +300,7 @@ async def predict(
                     "score_threshold": .1}), verbose=True
             )
             result = LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
-                data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'])
+                data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'],1)
         else:
             datadf = DataPipeline(Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/data/")
             datadf = datadf.process()
@@ -430,7 +432,7 @@ from langchain.llms import AzureOpenAI
 def predict(
         request: Request,
         response: Response,
-        data: PredictionRequest,
+        data: PredictionRequestAPI,
         api_key: str = Security(get_api_key),
 ):
     """
@@ -454,20 +456,25 @@ def predict(
         llms = retrieve_model(data, api_key)
 
     if data.type == 'general':
-        retriever = load_embedding(
-            Param.EMBEDDING_SAVE_PATH + api_key + "/embedding/"
-        )
+        if data.use_file:
+            retriever = load_embedding(
+                Param.EMBEDDING_SAVE_PATH + api_key + "/embedding/"
+            )
 
-        chain = ConversationalRetrievalChain.from_llm(
-            llm=llms, retriever=retriever.as_retriever(search_type="similarity_score_threshold", search_kwargs={
-                'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX),
-                'fetch_k': (
-                    data.conversation_config['fetch_k'] if data.conversation_config[
-                        'fetch_k'] else Param.FETCH_INDEX),
-                "score_threshold": .1}), verbose=True
-        )
-        result = LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
-            data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'])
+            chain = ConversationalRetrievalChain.from_llm(
+                llm=llms, retriever=retriever.as_retriever(search_type="similarity_score_threshold", search_kwargs={
+                    'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX),
+                    'fetch_k': (
+                        data.conversation_config['fetch_k'] if data.conversation_config[
+                            'fetch_k'] else Param.FETCH_INDEX),
+                    "score_threshold": .1}), verbose=True
+            )
+            result = LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
+                data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'],1)
+        else:
+            retriever=None
+            result = LLM(llms, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
+                data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'],0)
     else:
         datadf = DataPipeline(Param.EMBEDDING_SAVE_PATH + api_key + "/data/")
         datadf = datadf.process()

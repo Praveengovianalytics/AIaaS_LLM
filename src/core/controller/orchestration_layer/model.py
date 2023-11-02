@@ -71,7 +71,7 @@ class LLM:
         result = moderation_check(check1["content"], llm)
         return result
 
-    def predict(self, query: str = None, chat_history: list = None, intial_prompt: str = None):
+    def predict(self, query: str = None, chat_history: list = None, intial_prompt: str = None,use_file: int =1):
         """
         The predict function takes in a query and chat history, and returns an answer.
         The predict function is the main function of the bot. It takes in a user's query as well as
@@ -91,14 +91,19 @@ class LLM:
 
         if pre_require["check"] == "pass":
             if self.type == 'general':
-                result = self.chain(
-                    {
-                        "question": query + " \n System: " + (str(intial_prompt) if str(
-                            intial_prompt) else Param.SYSTEM_PROMPT) + "You do not respond as 'User' or pretend to be 'User'. You only response once. Please ensure that your answer is clear"
-                        ,
-                        "chat_history": [tuple(sublist) for sublist in chat_history],
-                    }
-                )
+                if use_file:
+                    result = self.chain(
+                        {
+                            "question": query + " \n System: " + (str(intial_prompt) if str(
+                                intial_prompt) else Param.SYSTEM_PROMPT) + "You do not respond as 'User' or pretend to be 'User'. You only response once. Please ensure that your answer is clear"
+                            ,
+                            "chat_history": [tuple(sublist) for sublist in chat_history],
+                        }
+                    )
+                else:
+                    result = self.chain(
+                       query
+                    )
             else:
                 result = ''
                 try:
@@ -117,11 +122,15 @@ class LLM:
             print(result)
         else:
             return pre_require["content"]
-        if self.type == 'general':
-            postcheck = self.post_check(result["answer"], self.llm) if Param.POST_CONTROL else {
-                'content': result['answer']}
-            print(postcheck)
 
-            return postcheck["content"]
+        if self.type == 'general':
+            if not use_file:
+                return result
+            else:
+                postcheck = self.post_check(result["answer"], self.llm) if Param.POST_CONTROL else {
+                    'content': result['answer']}
+                print(postcheck)
+
+                return postcheck["content"]
         else:
             return result
