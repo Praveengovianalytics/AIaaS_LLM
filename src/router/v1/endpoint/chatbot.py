@@ -305,7 +305,7 @@ async def predict(
                     'fetch_k': (
                         data.conversation_config['fetch_k'] if data.conversation_config[
                             'fetch_k'] else Param.FETCH_INDEX),
-                    "score_threshold": .1}), verbose=True
+                    "score_threshold": .001}), verbose=True
             )
             result = LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
                 data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'],1)
