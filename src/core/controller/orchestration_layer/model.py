@@ -102,7 +102,7 @@ class LLM:
                     )
                 else:
                     result = self.chain(
-                       query
+                       query=query,chat_history=[tuple(sublist) for sublist in chat_history]
                     )
             else:
                 result = ''

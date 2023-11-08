@@ -11,7 +11,7 @@ from fastapi.security import APIKeyHeader
 from langchain import OpenAI
 from langchain.callbacks import StreamingStdOutCallbackHandler
 from langchain.callbacks.manager import CallbackManager
-from langchain.chains import ConversationalRetrievalChain
+from langchain.chains import ConversationalRetrievalChain,ConversationChain
 from typing import List
 
 from core.controller.orchestration_layer.model import LLM
@@ -481,7 +481,7 @@ def predict(
                 data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'],1)
         else:
             retriever=None
-            result = LLM(llms, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
+            result = LLM(ConversationChain(llms=llms), llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
                 data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'],0)
     else:
         datadf = DataPipeline(Param.EMBEDDING_SAVE_PATH + api_key + "/data/")
