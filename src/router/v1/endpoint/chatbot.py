@@ -242,12 +242,20 @@ def create_embedding(
 
 
 def retrieve_model(data, username):
-    if (username in user_model_cache.keys()):
-        print('Exist Model in Cache')
+    if username in user_model_cache.keys():
+        if user_model_cache[username]['config'].items() == data.config.items():
 
-        return user_model_cache[username]['model']
+            print('Exist Model in Cache')
+
+            return user_model_cache[username]['model']
+        else:
+            for i in user_model_cache.keys():
+                if data.config.items() == user_model_cache[i]['config'].items():
+                    print('Exist Model in Cache')
+                    llms = user_model_cache[i]['model']
+                    return llms
+
     else:
-
         for i in user_model_cache.keys():
             if data.config.items() == user_model_cache[i]['config'].items():
                 print('Exist Model in Cache')

@@ -100,6 +100,8 @@ def register_api(request: Request, response: Response, data: APIKEYRequest, auth
 
         except Exception as e:
             return APIKeyNewResponse(status="fail", token='')
+    else:
+        return APIKeyNewResponse(status="fail", token='')
 
 
 def hash_password(password: str) -> str:
