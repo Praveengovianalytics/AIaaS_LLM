@@ -101,7 +101,7 @@ class LLM:
                         }
                     )
                 else:
-                    chat='\n'.join([("User: "+i if index%2==0 else "Assistant: "+i) for index,i in enumerate(chat_history)])
+                    chat='\n'.join([f"User: {index[0]} \n Assistant: {index[1]}" for index,i in enumerate(chat_history)])
                     prompt=f'''
                     You are a helpful chatbot. I will provide you the question and the chat history . Answer user's question according to needs.
                     
