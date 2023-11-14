@@ -481,7 +481,7 @@ def predict(
                 data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'],1)
         else:
             retriever=None
-            result = LLM(llms, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
+            result = LLM(llms, llms, retriever, 'general').predict(data.query, data.chat_history[-10:] if len(
                 data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'],0)
     else:
         datadf = DataPipeline(Param.EMBEDDING_SAVE_PATH + api_key + "/data/")
