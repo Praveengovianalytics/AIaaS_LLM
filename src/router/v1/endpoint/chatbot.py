@@ -173,7 +173,7 @@ def set_model(request: Request, response: Response, data: ModelRequest, authoriz
     Returns:
         A dictionary with a key of &quot;status&quot; and a value of &quot;healthy&quot;
     """
-    auth = decodeJWT(authorization,request.url)
+    auth = decodeJWT(authorization, request.url)
 
     if auth["valid"]:
         try:
@@ -214,7 +214,7 @@ def create_embedding(
 
     Returns:
         A success message if the embedding is created successfully"""
-    auth = decodeJWT(authorization,request.url)
+    auth = decodeJWT(authorization, request.url)
 
     if auth["valid"]:
         user_folder = Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/"
@@ -255,6 +255,7 @@ def retrieve_model(data, username):
                     llms = user_model_cache[i]['model']
                     return llms
 
+
     else:
         for i in user_model_cache.keys():
             if data.config.items() == user_model_cache[i]['config'].items():
@@ -262,12 +263,10 @@ def retrieve_model(data, username):
                 llms = user_model_cache[i]['model']
                 return llms
 
-        data.config['context_length'] = Param.LLM_CONTEXT_LENGTH
-
-        custom_llm = build_model(data)
-        user_model_cache[username] = {'model': custom_llm, 'config': data.config}
-        print('Created New Model in Cache')
-        return user_model_cache[username]['model']
+    custom_llm = build_model(data)
+    user_model_cache[username] = {'model': custom_llm, 'config': data.config}
+    print('Created New Model in Cache')
+    return user_model_cache[username]['model']
 
 
 @router.post("/predict")
@@ -290,7 +289,7 @@ async def predict(
 
     Returns:
         A predictions response"""
-    auth = decodeJWT(authorization,request.url)
+    auth = decodeJWT(authorization, request.url)
 
     if auth["valid"]:
         llms = retrieve_model(data, auth["data"]["username"])
@@ -308,7 +307,7 @@ async def predict(
                     "score_threshold": .001}), verbose=True
             )
             result = LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
-                data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'],1)
+                data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'], 1)
         else:
             datadf = DataPipeline(Param.EMBEDDING_SAVE_PATH + auth["data"]["username"] + "/data/")
             datadf = datadf.process()
@@ -351,7 +350,7 @@ def feedback(
 
     Returns:
         A json object with the status and message"""
-    auth = decodeJWT(authorization,request.url)
+    auth = decodeJWT(authorization, request.url)
 
     if auth["valid"]:
         with open(
@@ -378,8 +377,8 @@ def feedback(
 api_key_header = APIKeyHeader(name="X-API-Key")
 
 
-def get_api_key(api_key_header: str = Security(api_key_header),request: Request='') -> str:
-    datas=decodeAPIJWT(api_key_header)
+def get_api_key(api_key_header: str = Security(api_key_header), request: Request = '') -> str:
+    datas = decodeAPIJWT(api_key_header)
     if datas['valid']:
         logging.info(f'{datetime.datetime.now()} - {request.url}:{datas}')
         return api_key_header
@@ -429,6 +428,8 @@ def create_embedding(
     embedding.save_db_local()
 
     return APIResponse(status="success", message="Embedding Created Success")
+
+
 import os
 
 os.environ["OPENAI_API_TYPE"] = "azure"
@@ -456,12 +457,13 @@ def predict(
     Returns:
         A predictions response"""
 
-    if data.config['model']=='openai':
+    if data.config['model'] == 'openai':
         os.environ["OPENAI_API_KEY"] = data.config['api_key']
         os.environ["OPENAI_API_BASE"] = data.config['api_address']
-        llms=AzureOpenAI(model_name='gpt-3.5-turbo-16k',engine='gpt-35-turbo-16k-0613-vanilla')
+        llms = AzureOpenAI(model_name='gpt-3.5-turbo-16k', engine='gpt-35-turbo-16k-0613-vanilla')
     else:
         llms = retrieve_model(data, api_key)
+        print(llms)
 
     if data.type == 'general':
         if data.use_file:
@@ -475,14 +477,14 @@ def predict(
                     'fetch_k': (
                         data.conversation_config['fetch_k'] if data.conversation_config[
                             'fetch_k'] else Param.FETCH_INDEX),
-                    "score_threshold": .1}), verbose=True
+                    "score_threshold": .001}), verbose=True
             )
             result = LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
-                data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'],1)
+                data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'], 1)
         else:
-            retriever=None
+            retriever = None
             result = LLM(llms, llms, retriever, 'general').predict(data.query, data.chat_history[-10:] if len(
-                data.chat_history) > 10 else data.chat_history, data.conversation_config['bot_context_setting'],0)
+                data.chat_history) > 10 else data.chat_history, data.conversation_config['bot_context_setting'], 0)
     else:
         datadf = DataPipeline(Param.EMBEDDING_SAVE_PATH + api_key + "/data/")
         datadf = datadf.process()
