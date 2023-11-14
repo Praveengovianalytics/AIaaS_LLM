@@ -468,6 +468,10 @@ def predict(
             retriever = load_embedding(
                 Param.EMBEDDING_SAVE_PATH + api_key + "/embedding/"
             )
+        else:
+            retriever=load_embedding(
+                Param.EMBEDDING_SAVE_PATH + "default/"
+            )
 
             chain = ConversationalRetrievalChain.from_llm(
                 llm=llms, retriever=retriever.as_retriever(search_type="similarity_score_threshold", search_kwargs={
@@ -479,10 +483,7 @@ def predict(
             )
             result = LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
                 data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'],1)
-        else:
-            retriever=None
-            result = LLM(llms, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
-                data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'],0)
+
     else:
         datadf = DataPipeline(Param.EMBEDDING_SAVE_PATH + api_key + "/data/")
         datadf = datadf.process()
