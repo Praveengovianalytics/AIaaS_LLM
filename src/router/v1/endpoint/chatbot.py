@@ -473,16 +473,16 @@ def predict(
                 Param.EMBEDDING_SAVE_PATH + "default/"
             )
 
-            chain = ConversationalRetrievalChain.from_llm(
-                llm=llms, retriever=retriever.as_retriever(search_type="similarity_score_threshold", search_kwargs={
-                    'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX),
-                    'fetch_k': (
-                        data.conversation_config['fetch_k'] if data.conversation_config[
-                            'fetch_k'] else Param.FETCH_INDEX),
-                    "score_threshold": .1}), verbose=True
-            )
-            result = LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
-                data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'],1)
+        chain = ConversationalRetrievalChain.from_llm(
+            llm=llms, retriever=retriever.as_retriever(search_type="similarity_score_threshold", search_kwargs={
+                'k': (data.conversation_config['k'] if data.conversation_config['k'] else Param.SELECT_INDEX),
+                'fetch_k': (
+                    data.conversation_config['fetch_k'] if data.conversation_config[
+                        'fetch_k'] else Param.FETCH_INDEX),
+                "score_threshold": .1}), verbose=True
+        )
+        result = LLM(chain, llms, retriever, 'general').predict(data.query, data.chat_history[-3:] if len(
+            data.chat_history) > 3 else data.chat_history, data.conversation_config['bot_context_setting'],1)
 
     else:
         datadf = DataPipeline(Param.EMBEDDING_SAVE_PATH + api_key + "/data/")
