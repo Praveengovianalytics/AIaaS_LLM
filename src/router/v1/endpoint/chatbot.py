@@ -141,6 +141,7 @@ def build_model(data):
             top_p=data.config['top_p'] if 'top_p' in data.config else Param.TOP_P,
             n_gpu_layers=n_gpu_layers,
             n_batch=n_batch,
+            seed=0,
             callback_manager=callback_manager,
             n_ctx=4000,
             verbose=True,  # Verbose is required to pass to the callback manager
