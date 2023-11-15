@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/Praveengovianalytics/AIaaS_falcon"><img src="https://github.com/Praveengovianalytics/AIaaS_falcon/raw/master/img/AIAAS_FALCON.jpg" alt="AIaaS_LLM"></a>
+  <a href="https://bitbucket.dev.aws.singtel.com/projects/AIS/repos/ai-datasteward"><img src="https://github.com/Praveengovianalytics/AIaaS_falcon/raw/master/img/AIAAS_FALCON.jpg" alt="AIaaS_LLM"></a>
 </p>
 <p align="center">
     <em>Brainwave, high performance, easy to use, fast to infer, ready for production</em>
@@ -16,9 +16,9 @@
 
 ---
 
-**Documentation**: <a href="https://www.google.com" target="_blank">https://www.google.com</a>
+**Documentation**: Confluence
 
-**Source Code**: <a href="https://github.com/Praveengovianalytics/AIaaS_LLM" target="_blank">https://github.com/Praveengovianalytics/AIaaS_LLM</a>
+**Source Code**: <a href="https://bitbucket.dev.aws.singtel.com/projects/AIS/repos/ai-datasteward" target="_blank">https://bitbucket.dev.aws.singtel.com/projects/AIS/repos/ai-datasteward</a>
 
 ---
 
@@ -52,7 +52,7 @@ Uvicorn
 <div class="termy">
 
 ```console
-$ git clone https://github.com/Praveengovianalytics/AIaaS_LLM.git -b master
+$ git clone https://bitbucket.dev.aws.singtel.com/scm/ais/ai-datasteward.git -b master
 
 ---> 100%
 ```
@@ -196,10 +196,3 @@ You will see the alternative automatic documentation (provided by <a href="https
 
 To Be Filled
 
-## Authors
-- [@Praveengovianalytics](https://github.com/Praveengovianalytics)
-- [@zhuofan-16](https://github.com/zhuofan-16)
-
-## License
-
-This project is licensed under the terms of the MIT license.
