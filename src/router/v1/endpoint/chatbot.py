@@ -17,7 +17,7 @@ from typing import List
 from core.controller.orchestration_layer.model import LLM
 from core.schema.api_response import APIResponse
 from core.schema.feedback_request import FeedbackRequest
-from core.schema.prediction_request import PredictionRequest
+from core.schema.prediction_request import PredictionRequest, PredictionCCTRequestAPI
 from core.settings import Param
 from core.controller.orchestration_layer.embedding_pipeline import (
     EmbeddingPipeline,
@@ -517,3 +517,30 @@ def predict(
         result = LLM(agent, llms, None, 'data').predict(data.query)
 
     return APIResponse(status="success", message=result)
+
+from vllm import LLM, SamplingParams
+llm = LLM(model="meta-llama/Llama-2-13b")
+@router.post("/predict-CCT")
+def predict(
+        request: Request,
+        response: Response,
+        data: PredictionCCTRequestAPI,
+        api_key: str = Security(get_api_key),
+):
+    """
+    The predict function is the main function of this API. It takes in a query and chat history,
+    and returns a response from the model. The predict function also requires an authorization header
+    which contains a JWT token that has been signed by our server.
+
+    Args:
+        data: PredictionRequest: Pass the query and chat history to the predict function
+        authorization: str: Pass the jwt token to the function
+        : Pass the query and chat history to the model
+
+    Returns:
+        A predictions response"""
+    outputs = llm.generate(data.query, SamplingParams(temperature=0, top_p=0.95))
+
+
+    return APIResponse(status="success", message=outputs)
+
