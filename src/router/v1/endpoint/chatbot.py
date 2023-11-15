@@ -519,7 +519,7 @@ def predict(
     return APIResponse(status="success", message=result)
 
 from vllm import LLM, SamplingParams
-llm = LLM(model="meta-llama/Llama-2-13b")
+llm = LLM(model=Param.APP_PATH+'models/llama2-13b-full')
 @router.post("/predict-CCT")
 def predict(
         request: Request,
