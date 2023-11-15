@@ -460,7 +460,7 @@ def predict(
     if data.config['model'] == 'openai':
         os.environ["OPENAI_API_KEY"] = data.config['api_key']
         os.environ["OPENAI_API_BASE"] = data.config['api_address']
-        llms = AzureOpenAI(model_name='gpt-3.5-turbo-16k', engine='gpt-35-turbo-16k-0613-vanilla')
+        llms = AzureOpenAI(model_name='gpt-3.5-turbo-16k', engine='gpt-35-turbo-16k-0613-vanilla',temperature=0)
     else:
         llms = retrieve_model(data, api_key)
         print(llms)
