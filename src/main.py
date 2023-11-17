@@ -14,26 +14,14 @@ from core.schema.ratelimit_response import rate_limit_custom_handler
 import argparse
 
 from logs import log_config
-import logging
-import logging_loki
+from core.controller.logging import logger
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--port', dest='port', type=int, help='Port Number')
 args = parser.parse_args()
 
 port_set=Param.PORT_NUMBER if not args.port else args.port
-handler = logging_loki.LokiHandler(
-   url="http://127.0.0.1:3100/loki/api/v1/push",
-   version="1",
-    tags={"application": "aiaas-llm"},
-)
-logging.basicConfig(filename=Param.LOG_PATH+Param.ENVIRONMENT+'-log.txt',
-                    filemode='a',
-                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                    datefmt='%H:%M:%S',
-                    level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-logger.addHandler(handler)
+
 logger.info('='*20)
 logger.info(f' {datetime.datetime.now()} -BTO AIS Backend Service')
 logger.info(f' {datetime.datetime.now()} -Environment: {Param.ENVIRONMENT}')

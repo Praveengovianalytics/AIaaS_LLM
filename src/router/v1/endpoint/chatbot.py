@@ -41,7 +41,7 @@ from core.controller.authentication_layer.api_jwt import decodeAPIJWT
 
 from core.schema.prediction_request import PredictionRequestAPI
 
-from src.main import logger
+from core.controller.logging import logger
 
 ## Use In-Memory Ram
 

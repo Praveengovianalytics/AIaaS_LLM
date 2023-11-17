@@ -5,7 +5,7 @@ from typing import Dict
 import jwt
 from core.settings import Param
 
-from src.main import logger
+from core.controller.logging import logger
 
 
 def signJWT(username: str,request_url) -> Dict[str, str]:
