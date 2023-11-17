@@ -35,11 +35,13 @@ class Log_API(APIRoute):
 
 def wrapper(func):
     async def _app(request):
+        id_a=loggerid(request.headers.get('logger_id'))
+
         response = await func(request)
         logger.info(
-            f" {datetime.datetime.now()} - {loggerid(request.headers.get('logger_id'))} - {request.url} -Access Endpoint Header:{request.headers} ")
+            f" {datetime.datetime.now()} - {id_a} - {request.url} -Access Endpoint Header:{request.headers} ")
         logger.info(
-            f" {datetime.datetime.now()} - {loggerid(request.headers.get('logger_id'))} - {request.url} -Response: {response.body} ")
+            f" {datetime.datetime.now()} - {id_a} - {request.url} -Response: {response.body} ")
 
         print(vars(request), vars(response))
 
