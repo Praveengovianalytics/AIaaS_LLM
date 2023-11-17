@@ -5,6 +5,8 @@ from typing import Dict
 import jwt
 from core.settings import Param
 
+from src.main import logger
+
 
 def signJWT(username: str,request_url) -> Dict[str, str]:
     """
@@ -21,7 +23,7 @@ def signJWT(username: str,request_url) -> Dict[str, str]:
         "exp": datetime.datetime.now(tz=datetime.timezone.utc)
         + datetime.timedelta(minutes=180),
     }
-    logging.info(f'{datetime.datetime.now()} - {username}: {request_url} ')
+    logger.info(f'{datetime.datetime.now()} - {username}: {request_url} ')
     token = jwt.encode(payload, Param.JWT_SECRET_KEY, algorithm=Param.JWT_ALGORITHM)
 
     return token
@@ -46,7 +48,7 @@ Returns:
             Param.JWT_SECRET_KEY,
             algorithms=Param.JWT_ALGORITHM,
         )
-        logging.info(f'{datetime.datetime.now()} - {url}:{decoded_token}')
+        logger.info(f'{datetime.datetime.now()} - {url}:{decoded_token}')
         return {"valid": True, "data": decoded_token, "type": 0}
     except jwt.ExpiredSignatureError:
         return {"valid": False, "data": "Your Session Has Expired", "type": 1}
