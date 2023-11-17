@@ -66,7 +66,7 @@ def wrapper(func):
         logger.info(
             f" {datetime.datetime.now()} - {loggerid(request.headers.get('logger_id'))} - {request.url} -Access Endpoint Header:{request.headers} ")
         logger.info(
-            f" {datetime.datetime.now()} - {loggerid(request.headers.get('logger_id'))} - {request.url} -Response: {response} ")
+            f" {datetime.datetime.now()} - {loggerid(request.headers.get('logger_id'))} - {request.url} -Response: {response.json()} ")
 
         print(vars(request), vars(response))
 
