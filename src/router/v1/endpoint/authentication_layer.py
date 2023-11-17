@@ -21,6 +21,7 @@ from core.schema.login_transaction import APIKeyNewResponse
 from core.schema.login_transaction import APIKEYRequest
 from fastapi import Header
 
+from core.controller.logging import logger
 
 def loggerid(id):
     if not id:
