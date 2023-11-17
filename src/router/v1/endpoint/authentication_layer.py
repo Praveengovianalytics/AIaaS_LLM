@@ -37,9 +37,9 @@ def wrapper(func):
     async def _app(request):
         response = await func(request)
         logger.info(
-            f" {datetime.datetime.now()} - {loggerid(request.headers['logger_id'])} - {request.url} -Access Endpoint Header:{request.headers} ")
+            f" {datetime.datetime.now()} - {loggerid(request.headers.get('logger_id'))} - {request.url} -Access Endpoint Header:{request.headers} ")
         logger.info(
-            f" {datetime.datetime.now()} - {loggerid(request.headers['logger_id'])} - {request.url} -Response: {response} ")
+            f" {datetime.datetime.now()} - {loggerid(request.headers.get('logger_id'))} - {request.url} -Response: {response} ")
 
         print(vars(request), vars(response))
 
