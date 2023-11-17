@@ -25,6 +25,7 @@ port_set=Param.PORT_NUMBER if not args.port else args.port
 handler = logging_loki.LokiHandler(
    url="http://127.0.0.1:3100/loki/api/v1/push",
    version="1",
+    tags={"application": "aiaas-llm"},
 )
 logging.basicConfig(filename=Param.LOG_PATH+Param.ENVIRONMENT+'-log.txt',
                     filemode='a',
