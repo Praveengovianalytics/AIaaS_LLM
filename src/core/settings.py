@@ -2,7 +2,7 @@ class Param:
     """Configure Settings for Application"""
     USE_GPU= True
     APP_PATH = "/home/praveengovi_nlp/AIaaS_Projects/AIaas_LLM/AIaaS_LLM/"
-    PORT_NUMBER=8888
+    PORT_NUMBER=8000
     RUNNING_ADDRESS="0.0.0.0"
     DB_FAISS_PATH = f"{APP_PATH}embeddings/db_faiss"
     CHAT_LOG_PATH = "logs/feedback_log.txt"
