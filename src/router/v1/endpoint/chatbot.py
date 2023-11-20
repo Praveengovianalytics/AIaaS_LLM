@@ -1,12 +1,14 @@
 import datetime
 import logging
 import os
+import random
 
 import cachetools
 from fastapi import APIRouter, Header, HTTPException, Form, Security
 
 import shutil
 
+from fastapi.routing import APIRoute
 from fastapi.security import APIKeyHeader
 from langchain import OpenAI
 from langchain.callbacks import StreamingStdOutCallbackHandler
@@ -39,6 +41,8 @@ from core.controller.authentication_layer.api_jwt import decodeAPIJWT
 
 from core.schema.prediction_request import PredictionRequestAPI
 
+from core.controller.logging import logger
+
 ## Use In-Memory Ram
 
 user_model_cache = cachetools.LRUCache(maxsize=1)
@@ -46,8 +50,31 @@ callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
 n_gpu_layers = 35  # Change this value based on your model and your GPU VRAM pool.
 n_batch = 256
 
-router = APIRouter()
+def loggerid(id):
+    if not id:
+        return random.randint(1000000, 9999999)
+    else:
+        return id
+class Log_API(APIRoute):
+    def get_route_handler(self):
+        app = super().get_route_handler()
+        return wrapper(app)
 
+def wrapper(func):
+    async def _app(request):
+        id_a=loggerid(request.headers.get('logger_id'))
+        response = await func(request)
+        logger.info(
+            f" {datetime.datetime.now()} - {id_a} - {request.url} -Access Endpoint Header:{request.headers} ")
+        logger.info(
+            f" {datetime.datetime.now()} - {id_a} - {request.url} -Response: {response.body} ")
+
+        print(vars(request), vars(response))
+
+        return response
+    return _app
+
+router = APIRouter(route_class=Log_API)
 
 @router.get("/get_configure")
 @limiter.limit("5/second")
