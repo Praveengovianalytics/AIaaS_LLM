@@ -2,6 +2,7 @@ import datetime
 import logging
 import os
 import random
+import json
 
 import cachetools
 from fastapi import APIRouter, Header, HTTPException, Form, Security
@@ -65,11 +66,18 @@ def wrapper(func):
         id_a=loggerid(request.headers.get('logger_id'))
         response = await func(request)
         logger.info(
-            f" {datetime.datetime.now()} - {id_a} - {request.url} -Access Endpoint Header:{request.headers} ")
+            f" {datetime.datetime.now()} - id={id_a} - {request.url} - Access Endpoint Header={request.headers} ")
         logger.info(
-            f" {datetime.datetime.now()} - {id_a} - {request.url} -Response: {response.body} ")
+            f" {datetime.datetime.now()} - id={id_a} - {request.url}- Status={response.status_code} - Response={response.body} ")
 
         print(vars(request), vars(response))
+        body = response.body.decode('utf-8')
+        json_body = json.loads(body)
+        json_body['transaction_id']=id_a
+        # Update the response body with modified JSON
+        response.body = json.dumps(json_body).encode('utf-8')
+        print(response.body)
+        response.headers["content-length"] = str(len(response.body))
 
         return response
     return _app

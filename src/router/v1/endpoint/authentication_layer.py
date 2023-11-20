@@ -36,14 +36,20 @@ class Log_API(APIRoute):
 def wrapper(func):
     async def _app(request):
         id_a=loggerid(request.headers.get('logger_id'))
-
         response = await func(request)
         logger.info(
-            f" {datetime.datetime.now()} - {id_a} - {request.url} -Access Endpoint Header:{request.headers} ")
+            f" {datetime.datetime.now()} - id={id_a} - {request.url} - Access Endpoint Header={request.headers} ")
         logger.info(
-            f" {datetime.datetime.now()} - {id_a} - {request.url} -Response: {response.body} ")
+            f" {datetime.datetime.now()} - id={id_a} - {request.url}- Status={response.status_code} - Response={response.body} ")
 
         print(vars(request), vars(response))
+        body = response.body.decode('utf-8')
+        json_body = json.loads(body)
+        json_body['transaction_id']=id_a
+        # Update the response body with modified JSON
+        response.body = json.dumps(json_body).encode('utf-8')
+        print(response.body)
+        response.headers["content-length"] = str(len(response.body))
 
         return response
     return _app
