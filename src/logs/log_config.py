@@ -24,16 +24,24 @@ config = {
             "class": "logging.handlers.RotatingFileHandler",
             "filename": Param.LOG_PATH+Param.ENVIRONMENT+'-log.txt',
         },
+        "loki":{
+            "formatter": "access",
+            "class": "logging_loki.LokiHandler",
+            "url" : "http://127.0.0.1:3100/loki/api/v1/push",
+            "version" : "1",
+            "tags" : {"application": "aiaas-llm"}
+
+        }
     },
     "loggers": {
         "uvicorn.error": {
             "level": "ERROR",
-            "handlers": ["default"],
+            "handlers": ["default","loki"],
             "propagate": False,
         },
         "uvicorn.access": {
             "level": "INFO",
-            "handlers": ["access"],
+            "handlers": ["access","loki"],
             "propagate": False,
         },
         "root": {
