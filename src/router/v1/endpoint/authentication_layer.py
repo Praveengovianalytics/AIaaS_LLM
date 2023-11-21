@@ -37,8 +37,12 @@ def wrapper(func):
     async def _app(request):
         id_a=loggerid(request.headers.get('logger_id'))
         response = await func(request)
+        loghead=dict(request.headers).copy()
+        loghead = {key.lower(): value for key, value in loghead.items()}
+        loghead["authentication"]=""
+        loghead["x-api-key"]=""
         logger.info(
-            f" {datetime.datetime.now()} - id={id_a} - {request.url} - Access Endpoint Header={request.headers} ")
+            f" {datetime.datetime.now()} - id={id_a} - {request.url} - Access Endpoint Header={loghead} ")
         logger.info(
             f" {datetime.datetime.now()} - id={id_a} - {request.url}- Status={response.status_code} - Response={response.body} ")
 
