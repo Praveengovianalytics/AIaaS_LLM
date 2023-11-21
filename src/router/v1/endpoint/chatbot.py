@@ -81,7 +81,10 @@ def wrapper(func):
         loghead = {key.lower(): value for key, value in loghead.items()}
         loghead["authentication"]=""
         loghead["x-api-key"]=""
-        request_body=await request.body()
+        try:
+            request_body=await request.body()
+        except Exception as e:
+            request_body='Not Json Body'
         logger.info(
             f" {datetime.datetime.now()} - id={id_a} - {request.url} - Access Endpoint Header={loghead} - Body={ {request_body} if request_body else 'No Body'} ")
         logger.info(
