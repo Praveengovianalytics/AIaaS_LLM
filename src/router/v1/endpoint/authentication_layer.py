@@ -1,4 +1,5 @@
 import datetime
+import random
 
 from fastapi import APIRouter, HTTPException
 
@@ -9,6 +10,7 @@ from core.settings import Param
 
 from core.controller.authentication_layer.jwt import signJWT
 from core.limiter import limiter
+from fastapi.routing import APIRoute
 from starlette.requests import Request
 from starlette.responses import Response
 
@@ -19,7 +21,44 @@ from core.schema.login_transaction import APIKeyNewResponse
 from core.schema.login_transaction import APIKEYRequest
 from fastapi import Header
 
-router = APIRouter()
+from core.controller.logging import logger
+import json
+def loggerid(id):
+    if not id:
+        return random.randint(1000000, 9999999)
+    else:
+        return id
+class Log_API(APIRoute):
+    def get_route_handler(self):
+        app = super().get_route_handler()
+        return wrapper(app)
+
+def wrapper(func):
+    async def _app(request):
+        id_a=loggerid(request.headers.get('logger_id'))
+        response = await func(request)
+        loghead=dict(request.headers).copy()
+        loghead = {key.lower(): value for key, value in loghead.items()}
+        loghead["authentication"]=""
+        loghead["x-api-key"]=""
+        logger.info(
+            f" {datetime.datetime.now()} - id={id_a} - {request.url} - Access Endpoint Header={loghead} ")
+        logger.info(
+            f" {datetime.datetime.now()} - id={id_a} - {request.url}- Status={response.status_code} - Response={response.body} ")
+
+        print(vars(request), vars(response))
+        body = response.body.decode('utf-8')
+        json_body = json.loads(body)
+        json_body['transaction_id']=id_a
+        # Update the response body with modified JSON
+        response.body = json.dumps(json_body).encode('utf-8')
+        print(response.body)
+        response.headers["content-length"] = str(len(response.body))
+
+        return response
+    return _app
+
+router = APIRouter(route_class=Log_API)
 
 
 @router.post("/login", response_model=LoginResponse)

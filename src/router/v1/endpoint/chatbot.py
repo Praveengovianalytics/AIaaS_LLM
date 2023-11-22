@@ -1,18 +1,23 @@
 import datetime
 import logging
 import os
+import random
+import json
 
 import cachetools
 from fastapi import APIRouter, Header, HTTPException, Form, Security
 
 import shutil
+from langchain.callbacks.base import BaseCallbackHandler
 
+from fastapi.routing import APIRoute
 from fastapi.security import APIKeyHeader
 from langchain import OpenAI
 from langchain.callbacks import StreamingStdOutCallbackHandler
 from langchain.callbacks.manager import CallbackManager
 from langchain.chains import ConversationalRetrievalChain
 from typing import List
+from typing import Any, Dict
 
 from core.controller.orchestration_layer.model import LLM
 from core.schema.api_response import APIResponse
@@ -39,14 +44,73 @@ from core.controller.authentication_layer.api_jwt import decodeAPIJWT
 
 from core.schema.prediction_request import PredictionRequestAPI
 
+from core.controller.logging import logger
+from sentencepiece import SentencePieceProcessor
+
 ## Use In-Memory Ram
+class MyCustomHandler(BaseCallbackHandler):
+    def on_text(self, text: str, **kwargs: Any) -> Any:
+        logger.info(text)
+  
+    def on_chain_start(
+        self, serialized: Dict[str, Any], inputs: Dict[str, Any], **kwargs: Any
+    ) -> Any:
+        """Run when chain starts running."""
+        print("Chain started running")
 
 user_model_cache = cachetools.LRUCache(maxsize=1)
-callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+callback_manager = CallbackManager([MyCustomHandler()])
 n_gpu_layers = 35  # Change this value based on your model and your GPU VRAM pool.
 n_batch = 256
 
-router = APIRouter()
+def loggerid(id):
+    if not id:
+        return random.randint(1000000, 9999999)
+    else:
+        return id
+class Log_API(APIRoute):
+    def get_route_handler(self):
+        app = super().get_route_handler()
+        return wrapper(app)
+
+def wrapper(func):
+    async def _app(request):
+        id_a=loggerid(request.headers.get('logger_id'))
+        response = await func(request)
+        loghead=dict(request.headers).copy()
+        loghead = {key.lower(): value for key, value in loghead.items()}
+        loghead["authentication"]=""
+        loghead["x-api-key"]=""
+        try:
+            request_body=await request.body()
+        except Exception as e:
+            request_body='Not Json Body'
+        logger.info(
+            f" {datetime.datetime.now()} - id={id_a} - {request.url} - Access Endpoint Header={loghead} - Body={ {request_body} if request_body else 'No Body'} ")
+        logger.info(
+            f" {datetime.datetime.now()} - id={id_a} - {request.url}- Status={response.status_code} - Response={response.body} ")
+
+        print(vars(request), vars(response))
+        body = response.body.decode('utf-8')
+        json_body = json.loads(body)
+        json_body['transaction_id']=id_a
+        # Update the response body with modified JSON
+        response.body = json.dumps(json_body).encode('utf-8')
+        print(response.body)
+        response.headers["content-length"] = str(len(response.body))
+
+        return response
+    return _app
+
+router = APIRouter(route_class=Log_API)
+
+
+sp = SentencePieceProcessor(model_file=Param.APP_PATH+'tokenizer/tokenizer.model')
+
+def get_token(text):
+    tokens = sp.EncodeAsIds(text)
+    return len(tokens)
+
 
 
 @router.get("/get_configure")
@@ -515,8 +579,9 @@ def predict(
                                                      "Answer: <your final answer>'.")
 
         result = LLM(agent, llms, None, 'data').predict(data.query)
-
-    return APIResponse(status="success", message=result)
+    token=get_token(data.query) if data.query else "Data Not Available"
+    response_token=get_token(result) if result else "Data Not Available"
+    return {"status":"success", 'response':result,'request_token_length':token,'response_token_length':response_token}
 
 from vllm import LLM, SamplingParams
 llm = LLM(model=Param.APP_PATH+'models/llama2-13b-full')
@@ -539,8 +604,8 @@ def predict(
 
     Returns:
         A predictions response"""
-    outputs = llm.generate(data.query, SamplingParams(temperature=0, top_p=0.95))
+    outputs = llm.generate(data.query, SamplingParams(temperature=data.temperature, top_p=1,top_k=data.top_k,max_tokens=data.max_tokens))
 
 
-    return APIResponse(status="success", message=outputs)
+    return {"status":"success", "message":outputs}
 
