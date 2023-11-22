@@ -518,7 +518,7 @@ from langchain.llms import AzureOpenAI
 
 
 @router.post("/predictLB")
-def predict(
+async def predict(
         request: Request,
         response: Response,
         data: PredictionRequestAPI,
@@ -586,7 +586,7 @@ def predict(
 
 
 @router.post("/predict-CCT")
-def predict(
+async def predict(
         request: Request,
         response: Response,
         data: PredictionCCTRequestAPI,
@@ -606,6 +606,7 @@ def predict(
         A predictions response"""
     outputs = llm.generate(data.query, SamplingParams(temperature=data.temperature, top_p=1,top_k=data.top_k,max_tokens=data.max_tokens,frequency_penalty=data.frequency_penalty,repetition_penalty=data.repetition_penalty,presence_penalty=data.presence_penalty))
 
-
-    return {"status":"success", "message":outputs}
+    token=get_token(data.query) if data.query else "Data Not Available"
+    response_token=get_token(outputs[0].outputs[0].text) if outputs[0].outputs[0].text else "Data Not Available"
+    return {"status":"success", "message":outputs,"token_info":{"request_token_length":token,'response_token_length':response_token}}
 
