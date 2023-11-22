@@ -38,4 +38,7 @@ class PredictionCCTRequestAPI(BaseModel):
     """
 
     query: str
+    temperature:float
+    top_k:int
+    max_tokens:int
 

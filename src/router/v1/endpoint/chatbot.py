@@ -35,7 +35,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 from langchain.llms import LlamaCpp
 from core.schema.prediction_request import ModelRequest
-
+from vllm import LLM, SamplingParams
 from core.controller.orchestration_layer.science_pipeline import DataPipeline
 
 from core.controller.orchestration_layer.base import create_pandas_dataframe_agent
@@ -46,6 +46,7 @@ from core.schema.prediction_request import PredictionRequestAPI
 
 from core.controller.logging import logger
 from sentencepiece import SentencePieceProcessor
+llm = LLM(model=Param.VLLM_MODEL)
 
 ## Use In-Memory Ram
 class MyCustomHandler(BaseCallbackHandler):
@@ -583,8 +584,7 @@ def predict(
     response_token=get_token(result) if result else "Data Not Available"
     return {"status":"success", 'response':result,'request_token_length':token,'response_token_length':response_token}
 
-from vllm import LLM, SamplingParams
-llm = LLM(model=Param.APP_PATH+'models/llama2-13b-full')
+
 @router.post("/predict-CCT")
 def predict(
         request: Request,

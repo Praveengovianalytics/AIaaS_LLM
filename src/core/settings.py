@@ -2,6 +2,7 @@ class Param:
     """Configure Settings for Application"""
     USE_GPU= True
     APP_PATH = "/home/praveengovi_nlp/AIaaS_Projects/AIaas_LLM/AIaaS_LLM/"
+    GARDEN_PATH="/home/praveengovi_nlp/AIaaS_Projects/AIaas_LLM/AIaaS_LLM/"
     PORT_NUMBER=8888
     RUNNING_ADDRESS="0.0.0.0"
     DB_FAISS_PATH = f"{APP_PATH}embeddings/db_faiss"
@@ -9,18 +10,11 @@ class Param:
     LLM_MODEL_TYPE = "llama"
     # Default Model Configuration
     LLM_MODEL = {
-        'mistral-7b': f"{APP_PATH}models/mistral-7b-openorca.Q4_K_M.gguf",
-        'zephyr-7b': f"{APP_PATH}models/zephyr-7b-beta.Q4_K_M.gguf",
-                      'llama2-7b': f"{APP_PATH}models/llama-2-7b-chat.Q4_K_M.gguf",
-        'llama2-13b': f"{APP_PATH}models/llama-2-13b-chat.Q4_K_M.gguf"
-
-
+        'mistral-7b': f"{GARDEN_PATH}models/mistral-7b-openorca.Q4_K_M.gguf",
+        'llama2-13b': f"{GARDEN_PATH}models/llama-2-13b-chat.Q4_K_M.gguf"
     }
+    VLLM_MODEL=f"{GARDEN_PATH}/Llama-2-13b-hf"
     DATA_LLM_MODEL = {
-        'WizardCoder-34B': f"{APP_PATH}models/WizardLM-WizardCoder-Python-34B-V1.0.Q4_K_M.gguf",
-        'Ziya-34B': f"{APP_PATH}models/ziya-coding-34b-v1.0.Q4_K_M.gguf",
-        'CodeFuse-34B': f"{APP_PATH}models/codefuse-codellama-34b.Q4_K_M.gguf"
-
     }
     LLM_MAX_NEW_TOKENS = 4000
     LLM_TEMPERATURE = 0.4
@@ -36,7 +30,7 @@ class Param:
     SELECT_INDEX = 10
     SYSTEM_PROMPT = ("Do note that Your are a data dictionary bot. Your task is to fully answer the user's query based "
                      "on the information provided to you.")
-    EMBEDDING_MODEL_PATH = f"{APP_PATH}models/bge-large-en"
+    EMBEDDING_MODEL_PATH = f"{GARDEN_PATH}models/bge-large-en"
     EMBEDDING_MODEL_NAME = "BAAI/bge-large-en"
     EMBEDDING_DEVICE = "cuda"
     CSV_DELIMITER = ","
