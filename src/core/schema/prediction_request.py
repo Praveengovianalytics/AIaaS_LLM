@@ -41,4 +41,8 @@ class PredictionCCTRequestAPI(BaseModel):
     temperature:float
     top_k:int
     max_tokens:int
+    frequency_penalty:float
+    repetition_penalty:float
+    presence_penalty:float
+
 

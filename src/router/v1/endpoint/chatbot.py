@@ -604,7 +604,7 @@ def predict(
 
     Returns:
         A predictions response"""
-    outputs = llm.generate(data.query, SamplingParams(temperature=data.temperature, top_p=1,top_k=data.top_k,max_tokens=data.max_tokens))
+    outputs = llm.generate(data.query, SamplingParams(temperature=data.temperature, top_p=1,top_k=data.top_k,max_tokens=data.max_tokens,frequency_penalty=data.frequency_penalty,repetition_penalty=data.repetition_penalty,presence_penalty=data.presence_penalty))
 
 
     return {"status":"success", "message":outputs}
