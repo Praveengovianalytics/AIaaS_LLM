@@ -31,3 +31,11 @@ class PredictionRequestAPI(BaseModel):
     config:dict
     conversation_config:dict
     use_file:int
+
+class PredictionCCTRequestAPI(BaseModel):
+    """
+    Prediction Request Model
+    """
+
+    query: str
+

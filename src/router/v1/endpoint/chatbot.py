@@ -22,7 +22,7 @@ from typing import Any, Dict
 from core.controller.orchestration_layer.model import LLM
 from core.schema.api_response import APIResponse
 from core.schema.feedback_request import FeedbackRequest
-from core.schema.prediction_request import PredictionRequest
+from core.schema.prediction_request import PredictionRequest, PredictionCCTRequestAPI
 from core.settings import Param
 from core.controller.orchestration_layer.embedding_pipeline import (
     EmbeddingPipeline,
@@ -582,3 +582,30 @@ def predict(
     token=get_token(data.query) if data.query else "Data Not Available"
     response_token=get_token(result) if result else "Data Not Available"
     return {"status":"success", 'response':result,'request_token_length':token,'response_token_length':response_token}
+
+from vllm import LLM, SamplingParams
+llm = LLM(model=Param.APP_PATH+'models/llama2-13b-full')
+@router.post("/predict-CCT")
+def predict(
+        request: Request,
+        response: Response,
+        data: PredictionCCTRequestAPI,
+        api_key: str = Security(get_api_key),
+):
+    """
+    The predict function is the main function of this API. It takes in a query and chat history,
+    and returns a response from the model. The predict function also requires an authorization header
+    which contains a JWT token that has been signed by our server.
+
+    Args:
+        data: PredictionRequest: Pass the query and chat history to the predict function
+        authorization: str: Pass the jwt token to the function
+        : Pass the query and chat history to the model
+
+    Returns:
+        A predictions response"""
+    outputs = llm.generate(data.query, SamplingParams(temperature=data.temperature, top_p=1,top_k=data.top_k,max_tokens=data.max_tokens))
+
+
+    return {"status":"success", "message":outputs}
+
