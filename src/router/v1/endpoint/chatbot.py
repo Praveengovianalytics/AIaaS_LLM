@@ -582,7 +582,7 @@ async def predict(
         result = LLM(agent, llms, None, 'data').predict(data.query)
     token=get_token(data.query) if data.query else "Data Not Available"
     response_token=get_token(result) if result else "Data Not Available"
-    return {"status":"success", 'response':result,'request_token_length':token,'response_token_length':response_token}
+    return {"status":"success", 'message':result,'request_token_length':token,'response_token_length':response_token}
 
 
 @router.post("/predict-CCT")
