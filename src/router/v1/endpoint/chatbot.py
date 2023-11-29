@@ -35,7 +35,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 from langchain.llms import LlamaCpp
 from core.schema.prediction_request import ModelRequest
-from vllm import LLM, SamplingParams
+# from vllm import LLM, SamplingParams
 from core.controller.orchestration_layer.science_pipeline import DataPipeline
 
 from core.controller.orchestration_layer.base import create_pandas_dataframe_agent
@@ -61,7 +61,7 @@ class MyCustomHandler(BaseCallbackHandler):
 
 user_model_cache = cachetools.LRUCache(maxsize=1)
 callback_manager = CallbackManager([MyCustomHandler()])
-n_gpu_layers = 35  # Change this value based on your model and your GPU VRAM pool.
+n_gpu_layers = 50  # Change this value based on your model and your GPU VRAM pool.
 n_batch = 256
 
 def loggerid(id):
