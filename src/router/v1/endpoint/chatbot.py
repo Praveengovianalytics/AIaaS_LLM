@@ -46,7 +46,7 @@ from core.schema.prediction_request import PredictionRequestAPI
 
 from core.controller.logging import logger
 from sentencepiece import SentencePieceProcessor
-llm = LLM(model=Param.VLLM_MODEL)
+# llm = LLM(model=Param.VLLM_MODEL)
 
 ## Use In-Memory Ram
 class MyCustomHandler(BaseCallbackHandler):
@@ -196,22 +196,22 @@ def health_check(request: Request, response: Response):
     return {"status": "healthy"}
 
 
-# default_llm = LlamaCpp(
-#             model_path=Param.LLM_MODEL['llama2-13b'],
-#             temperature=0,
-#             n_gpu_layers=n_gpu_layers,
-#             n_batch=n_batch,
-#             seed=0,
-#             callback_manager=callback_manager,
-#             n_ctx=4000,
-#             verbose=True,  # Verbose is required to pass to the callback manager
-#         )
+default_llm = LlamaCpp(
+            model_path=Param.LLM_MODEL['llama2-13b'],
+            temperature=0,
+            n_gpu_layers=n_gpu_layers,
+            n_batch=n_batch,
+            seed=0,
+            callback_manager=callback_manager,
+            n_ctx=4000,
+            verbose=True,  # Verbose is required to pass to the callback manager
+        )
 
 
 def build_model(data):
     if data.type == 'general':
-        # if data.config['model']=='llama2-13b':
-        #     return default_llm
+        if data.config['model']=='llama2-13b':
+            return default_llm
         custom_llm = LlamaCpp(
             model_path=Param.LLM_MODEL[data.config['model']],
             temperature=data.config[
